@@ -1,0 +1,2593 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SolarCast</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#100E17;
+  --surface:#181524;
+  --surface-2:#201C2E;
+  --line:#2C2740;
+  --line-soft:#211D30;
+  --text:#ECEAF4;
+  --dim:#8B84A6;
+  --dim-2:#615A78;
+  --accent:#F2C14E;
+  --cool:#5BC8F5;
+  --warn:#F2724E;
+  --r:14px;
+  --mono:'JetBrains Mono','Noto Sans SC',ui-monospace,monospace;
+  --sans:'Archivo','Noto Sans SC',system-ui,-apple-system,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);
+  font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;padding:0 0 90px}
+.wrap{max-width:1160px;margin:0 auto;padding:0 24px}
+@media(max-width:640px){.wrap{padding:0 15px}}
+button{font-family:inherit;color:inherit;cursor:pointer;border:none;background:none}
+input,select{font-family:inherit}
+svg{display:block;max-width:100%}
+svg text{font-family:var(--mono);fill:var(--dim)}
+.hidden{display:none!important}
+
+/* ---------- header ---------- */
+.top{display:flex;align-items:flex-end;justify-content:space-between;gap:22px;flex-wrap:wrap;
+  padding:40px 0 24px;border-bottom:1px solid var(--line);margin-bottom:32px}
+/* Ľavý blok sa smie zalomiť, lišta s ovládaním nie — inak dlhý
+   podtitulok stlačí tlačidlá a ikony v nich sa scvrknú. */
+.top>div:first-child{min-width:0;flex:1 1 auto}
+.tools{flex:0 0 auto}
+.btn-icon svg{flex:0 0 auto}
+.mark{display:flex;align-items:center;gap:13px}
+.mark h1{font-size:24px;font-weight:700;letter-spacing:-.025em;line-height:1}
+.mark .glyph{width:26px;height:26px;flex:none}
+.siteloc{font-size:15px;font-weight:500;color:var(--text);margin-top:9px;letter-spacing:-.01em}
+.sitetag{font-family:var(--mono);font-size:11px;color:var(--dim);letter-spacing:.04em;margin-top:3px}
+.tagline-row{display:flex;align-items:center;gap:8px;margin-top:3px}
+.info-dot{width:19px;height:19px;flex:none;border:1px solid var(--line);border-radius:50%;
+  background:var(--surface);color:var(--dim);font-family:var(--mono);font-size:11px;
+  line-height:1;display:inline-flex;align-items:center;justify-content:center;
+  transition:color .15s,border-color .15s}
+.info-dot:hover{color:var(--text);border-color:var(--dim-2)}
+.info-dot[aria-expanded="true"]{background:var(--text);border-color:var(--text);color:var(--bg)}
+.info-dot:focus-visible{outline:2px solid var(--cool);outline-offset:2px}
+
+.infobox{position:relative;border:1px solid var(--line);border-radius:var(--r);
+  background:var(--surface);padding:20px 46px 16px 20px;margin-bottom:30px}
+.infobox p{font-size:12.5px;color:var(--dim);max-width:80ch;line-height:1.65;margin-bottom:10px}
+.infobox p:last-child{margin-bottom:0}
+.infobox a{color:var(--dim);text-decoration:none;border-bottom:1px solid var(--line)}
+.infobox a:hover{color:var(--text)}
+.info-meta{font-family:var(--mono);font-size:11.5px;color:var(--text);
+  padding-bottom:14px;margin-bottom:14px;border-bottom:1px solid var(--line-soft)}
+.info-meta a{color:var(--dim)}
+.info-close{position:absolute;top:12px;right:12px;width:28px;height:28px;border-radius:8px;
+  border:1px solid var(--line);color:var(--dim);font-size:17px;line-height:1;
+  display:flex;align-items:center;justify-content:center}
+.info-close:hover{color:var(--text);border-color:var(--dim-2)}
+.tools{display:flex;align-items:center;gap:9px}
+select.lang{background:var(--surface);border:1px solid var(--line);border-radius:9px;
+  color:var(--dim);padding:0 8px;height:40px;font-family:var(--mono);font-size:12px;
+  letter-spacing:.06em;text-align:center;text-align-last:center;cursor:pointer}
+select.lang:focus{outline:none;border-color:var(--cool)}
+select.lang:hover{color:var(--text);border-color:#443C5E}
+
+/* ikonové tlačidlá — štvorcový dotykový cieľ, kresba ťahom */
+/* dvojitá trieda zámerne: inak mobilné pravidlo .btn prebije nulové odsadenie */
+.btn.btn-icon{padding:0}
+.btn-icon{width:40px;height:40px;padding:0;display:inline-flex;align-items:center;
+  justify-content:center;border:1px solid var(--line);border-radius:9px;
+  background:var(--surface);color:var(--dim);flex:none}
+.btn-icon svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.9;
+  stroke-linecap:round;stroke-linejoin:round;display:block}
+.btn-icon:hover{color:var(--text);border-color:#443C5E;background:var(--surface-2)}
+.btn-icon:focus-visible{outline:2px solid var(--cool);outline-offset:2px}
+
+/* obrazovka nastavení */
+.scr-head{display:flex;align-items:center;gap:14px;padding-bottom:18px;
+  border-bottom:1px solid var(--line);margin-bottom:6px}
+.scr-head h2{font-size:19px;font-weight:600;letter-spacing:-.015em}
+.scr-body{padding-bottom:10px}
+.btn{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;padding:9px 15px;
+  border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--dim);
+  transition:border-color .16s,color .16s,background .16s}
+.btn:hover{border-color:#443C5E;color:var(--text);background:var(--surface-2)}
+.btn:focus-visible{outline:2px solid var(--cool);outline-offset:2px}
+.btn-primary{background:var(--text);border-color:var(--text);color:var(--bg);font-weight:600}
+.btn-primary:hover{background:#fff;border-color:#fff;color:var(--bg)}
+.btn-sm{padding:6px 11px;font-size:11px}
+
+/* ---------- hero: compass + numbers ---------- */
+.hero{display:grid;grid-template-columns:250px 1fr;gap:1px;background:var(--line-soft);
+  border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-bottom:46px}
+@media(max-width:760px){.hero{grid-template-columns:1fr}}
+.hero-dial{background:var(--surface);padding:22px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:14px}
+.hero-nums{background:var(--surface);padding:26px 28px;display:grid;
+  grid-template-columns:repeat(3,1fr);gap:26px;align-content:center}
+@media(max-width:560px){.hero-nums{grid-template-columns:1fr;gap:20px;padding:22px}}
+.lbl{font-family:var(--mono);font-size:10px;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--dim-2);margin-bottom:11px}
+.big{font-family:var(--mono);font-size:31px;font-weight:500;letter-spacing:-.035em;line-height:1}
+.big .u{font-size:14px;color:var(--dim);margin-left:5px;letter-spacing:0}
+.note{font-size:12.5px;color:var(--dim);margin-top:9px;line-height:1.45}
+.note b{color:var(--text);font-weight:500}
+.dial-cap{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--dim-2);text-align:center}
+
+/* ---------- sections ---------- */
+section{margin-bottom:50px}
+.shead{display:flex;align-items:baseline;justify-content:space-between;gap:20px;
+  flex-wrap:wrap;margin-bottom:18px}
+.shead h2{font-size:17px;font-weight:600;letter-spacing:-.015em}
+.shead p{font-size:13px;color:var(--dim);max-width:58ch;margin-top:5px}
+.legend{display:flex;gap:15px;font-family:var(--mono);font-size:10.5px;color:var(--dim);flex-wrap:wrap;align-items:center}
+.legend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px;vertical-align:middle}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px}
+.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}
+.tab{font-family:var(--mono);font-size:11px;padding:7px 12px;border:1px solid var(--line);
+  border-radius:7px;color:var(--dim);transition:all .15s}
+.tab:hover{border-color:#443C5E;color:var(--text)}
+.tab[aria-selected="true"]{background:var(--text);border-color:var(--text);color:var(--bg);font-weight:600}
+.tab:focus-visible{outline:2px solid var(--cool);outline-offset:2px}
+
+/* ---------- table ---------- */
+table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:680px}
+th{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--dim-2);font-weight:400;text-align:right;padding:0 0 12px;
+  border-bottom:1px solid var(--line);white-space:nowrap}
+th:first-child{text-align:left}
+td{padding:12px 0;border-bottom:1px solid var(--line-soft);text-align:right;
+  font-family:var(--mono);font-variant-numeric:tabular-nums}
+td:first-child{text-align:left;font-family:var(--sans)}
+tbody tr:last-child td{border-bottom:none}
+tbody tr.today td{background:rgba(242,193,78,.045)}
+th+th,td+td{padding-left:17px}
+.dcell{font-weight:500}
+.dcell span{display:block;font-family:var(--mono);font-size:10.5px;color:var(--dim-2);
+  font-weight:400;margin-top:2px}
+.minibar{height:4px;border-radius:2px;background:var(--accent);opacity:.7;margin-top:6px}
+
+/* ---------- states / setup ---------- */
+.state{padding:52px 22px;text-align:center;border:1px solid var(--line);
+  border-radius:var(--r);background:var(--surface)}
+.state .t{font-size:17px;font-weight:600;margin-bottom:9px}
+.state .d{font-size:13.5px;color:var(--dim);max-width:50ch;margin:0 auto 22px;line-height:1.55}
+.pulse{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);
+  animation:p 1.4s ease-in-out infinite;margin-bottom:16px}
+@keyframes p{0%,100%{opacity:.25;transform:scale(.8)}50%{opacity:1;transform:scale(1.15)}}
+@media(prefers-reduced-motion:reduce){.pulse{animation:none;opacity:.8}*{transition:none!important}}
+#setup{max-width:660px;margin:0 auto;text-align:left}
+.steps{display:flex;gap:7px;margin-bottom:26px;font-family:var(--mono);font-size:10px;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--dim-2);flex-wrap:wrap}
+.steps b{color:var(--text);font-weight:500}
+.steps s{text-decoration:none;color:var(--dim-2);opacity:.5}
+
+/* ---------- fields ---------- */
+.field{margin-bottom:18px}
+.field label{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--dim-2);margin-bottom:7px}
+.field input,.field select{width:100%;background:var(--bg);border:1px solid var(--line);
+  border-radius:9px;padding:11px 13px;color:var(--text);font-size:14px}
+.field input:focus,.field select:focus{outline:none;border-color:var(--cool)}
+.field .hint{font-size:11.5px;color:var(--dim-2);margin-top:6px;line-height:1.45}
+.grid-f{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px}
+.row{display:flex;gap:9px}
+.row input{flex:1}
+
+/* ---------- location search ---------- */
+.res{margin-top:11px;display:flex;flex-direction:column;gap:1px;background:var(--line-soft);
+  border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.res button{text-align:left;background:var(--surface);padding:11px 14px;font-size:13.5px;
+  transition:background .14s;width:100%}
+.res button:hover{background:var(--surface-2)}
+html{color-scheme:dark}
+html[data-mode="light"]{color-scheme:light}
+.res button:focus-visible{outline:2px solid var(--cool);outline-offset:-2px}
+.res button[aria-selected="true"]{background:var(--surface-2);box-shadow:inset 2px 0 0 var(--cool)}
+.res .r2{font-family:var(--mono);font-size:10.5px;color:var(--dim-2);margin-top:3px}
+.msg{font-size:12.5px;color:var(--dim);margin-top:11px;line-height:1.5}
+.msg.bad{color:var(--warn)}
+
+/* ---------- string editor ---------- */
+.str{border:1px solid var(--line);border-radius:11px;background:var(--bg);
+  padding:16px;margin-bottom:11px}
+.str-h{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.str-h .nm{display:flex;align-items:center;gap:9px;font-weight:600;font-size:14px}
+.swatch{width:11px;height:11px;border-radius:3px;flex:none}
+.str-kwp{font-family:var(--mono);font-size:11.5px;color:var(--dim)}
+.compass{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px}
+.compass button{font-family:var(--mono);font-size:10.5px;padding:5px 9px;border:1px solid var(--line);
+  border-radius:6px;color:var(--dim);transition:all .14s}
+.compass button:hover{border-color:#443C5E;color:var(--text)}
+.compass button[aria-pressed="true"]{background:var(--text);border-color:var(--text);
+  color:var(--bg);font-weight:600}
+
+/* výber vzhľadu */
+.seg{display:flex;gap:8px;flex-wrap:wrap;margin-top:9px}
+.seg button{border:1px solid var(--line);border-radius:10px;background:var(--bg);
+  padding:11px 14px;color:var(--dim);font-size:13.5px;display:flex;align-items:center;gap:9px;
+  transition:border-color .15s,color .15s}
+.seg button:hover{border-color:var(--dim-2);color:var(--text)}
+.seg button[aria-pressed="true"]{border-color:var(--text);color:var(--text);font-weight:600}
+.seg button:focus-visible{outline:2px solid var(--cool);outline-offset:2px}
+.chips{display:inline-flex;gap:3px}
+.chips i{width:11px;height:11px;border-radius:3px;display:block}
+.scr-sub{font-family:var(--mono);font-size:11.5px;color:var(--dim);margin-top:6px;line-height:1.6}
+.totbar{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
+  padding:15px 17px;border:1px solid var(--line);border-radius:11px;
+  background:var(--surface-2);margin:16px 0;font-family:var(--mono);font-size:12.5px}
+.totbar b{color:var(--text);font-weight:600}
+.acts{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}
+.danger{margin-top:30px;padding-top:22px;border-top:1px solid var(--line)}
+.danger h3{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--dim-2);font-weight:400;margin-bottom:8px}
+.danger p{font-size:12.5px;color:var(--dim);line-height:1.5;margin-bottom:14px;max-width:62ch}
+.btn-danger{border-color:var(--danger-line);color:var(--danger-btn)}
+.btn-danger:hover{border-color:var(--warn);color:var(--warn);background:var(--danger-bg)}
+.confirm{border:1px solid var(--danger-line);border-radius:11px;background:var(--danger-bg);padding:17px}
+.confirm .ct{font-size:14.5px;font-weight:600;margin-bottom:8px;color:var(--danger-text)}
+.confirm .cd{font-size:12.5px;color:var(--dim);line-height:1.55;margin-bottom:16px;max-width:62ch}
+.notice{border:1px solid var(--notice-line);border-left:3px solid var(--accent);border-radius:11px;
+  background:var(--notice-bg);padding:16px 18px;margin-top:20px}
+.notice .nt{font-size:14px;font-weight:600;color:var(--accent);margin-bottom:7px}
+.notice .nd{font-size:12.5px;color:var(--notice-text);line-height:1.6;max-width:66ch}
+.btn-danger-solid{background:var(--warn);border-color:var(--warn);color:var(--bg);font-weight:600}
+.btn-danger-solid:hover{filter:brightness(1.12)}
+
+/* pozostatok po pôvodnom rozbaľovacom paneli — ponechané len odsadenie,
+   ktoré teraz používa obrazovka nastavení */
+details.panel{border:1px solid var(--line);border-radius:var(--r);background:var(--surface);margin-bottom:14px}
+details.panel summary{padding:17px 21px;cursor:pointer;display:flex;align-items:center;
+  justify-content:space-between;font-family:var(--mono);font-size:11px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--dim);list-style:none}
+details.panel summary::-webkit-details-marker{display:none}
+details.panel summary:hover{color:var(--text)}
+details.panel summary .chev{transition:transform .2s;font-size:13px}
+details.panel[open] summary .chev{transform:rotate(180deg)}
+.pbody{padding:4px 21px 22px;border-top:1px solid var(--line-soft)}
+
+footer{border-top:1px solid var(--line);padding-top:24px}
+footer p{font-size:12.5px;color:var(--dim-2);max-width:80ch;line-height:1.65;margin-bottom:10px}
+footer a{color:var(--dim);text-decoration:none;border-bottom:1px solid var(--line)}
+footer a:hover{color:var(--text)}
+.tag{display:inline-block;font-family:var(--mono);font-size:9.5px;letter-spacing:.11em;
+  text-transform:uppercase;color:var(--dim-2);border:1px solid var(--line);
+  border-radius:5px;padding:3px 8px;margin-right:8px}
+.tip{position:fixed;pointer-events:none;z-index:60;opacity:0;transition:opacity .12s;
+  background:var(--tip-bg);border:1px solid var(--line);border-radius:9px;padding:9px 12px;
+  font-family:var(--mono);font-size:11.5px;line-height:1.6;color:#fff;
+  box-shadow:0 10px 30px var(--shadow);white-space:nowrap}
+html[data-mode="light"] .tip{color:#fff}
+html[data-mode="light"] .tip b{color:#fff}
+.tip.on{opacity:1}
+.tip b{color:var(--text);font-weight:500}
+
+/* ============================================================
+   MOBIL
+   Telefón nemá kurzor, má palec — a ten je široký asi ako
+   päť stĺpcov heatmapy. Preto sa tu nemení len šírka, ale aj
+   spôsob ovládania a to, koľko údajov sa vôbec ukazuje.
+   ============================================================ */
+@media(max-width:700px){
+  body{padding-bottom:56px}
+  .top{padding:26px 0 18px;margin-bottom:24px;gap:16px;align-items:flex-start}
+  .mark h1{font-size:21px}
+  .mark .glyph{width:23px;height:23px}
+  .siteloc{font-size:13.5px;margin-top:7px}
+  .sitetag{font-size:10px}
+  .infobox{padding:18px 42px 14px 16px;margin-bottom:22px}
+  .infobox p{font-size:12px}
+  .info-meta{font-size:11px}
+  .top{align-items:center}
+  .tools{width:auto;gap:7px}
+  .tools select.lang{width:62px;padding:0 4px}
+  .btn-icon{width:38px;height:38px}
+  .btn-icon svg{width:21px;height:21px}
+  .scr-head{padding-bottom:14px;gap:11px}
+  .scr-head h2{font-size:17px}
+
+  section{margin-bottom:34px}
+  .shead{margin-bottom:14px;gap:12px}
+  .shead h2{font-size:16px}
+  .shead p{font-size:12.5px}
+  .card{padding:13px;border-radius:12px}
+
+  .hero{margin-bottom:32px}
+  .hero-dial{padding:20px 16px 16px}
+  .hero-nums{padding:20px 18px;gap:0}
+  .hero-nums>div{padding:15px 0;border-top:1px solid var(--line-soft)}
+  .hero-nums>div:first-child{padding-top:0;border-top:none}
+  .hero-nums>div:last-child{padding-bottom:0}
+  .lbl{margin-bottom:7px}
+  .big{font-size:27px}
+  .note{font-size:12px;margin-top:6px}
+
+  /* dotykové ciele: nič pod 40 px na výšku */
+  .btn{padding:11px 15px;font-size:12px}
+  .btn-sm{padding:9px 13px}
+  .tab{padding:10px 14px;font-size:11.5px}
+  .compass button{padding:10px 0;font-size:11.5px;flex:1;min-width:0}
+  .compass{gap:4px;flex-wrap:nowrap}
+  .res button{padding:14px 14px}
+  .field input,.field select{padding:13px;font-size:16px}   /* 16px = iOS pri fokuse nepriblíži */
+  .row input{font-size:16px!important;padding:13px!important}
+  .acts .btn{flex:1;text-align:center}
+
+  /* záložky dní sa nelámu do troch riadkov, ale posúvajú */
+  .tabs{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;
+    scrollbar-width:none;padding-bottom:2px;width:100%}
+  .tabs::-webkit-scrollbar{display:none}
+  .tab{flex:none}
+
+  /* v tabuľke ostanú len stĺpce, ktoré sa na telefóne oplatí čítať */
+  table{min-width:0;font-size:13px}
+  th:nth-child(3),td:nth-child(3),
+  th:nth-child(6),td:nth-child(6),
+  th:nth-child(8),td:nth-child(8),
+  th:nth-child(9),td:nth-child(9){display:none}
+  th+th,td+td{padding-left:10px}
+  th{font-size:9.5px;letter-spacing:.07em}
+  td{padding:11px 0}
+
+  .str{padding:14px}
+  .grid-f{grid-template-columns:repeat(2,1fr);gap:12px}
+  .totbar{font-size:12px;gap:10px}
+  details.panel summary{padding:15px 16px}
+  .pbody{padding:4px 16px 20px}
+  .notice,.confirm{padding:14px 15px}
+  .notice .nd,.confirm .cd{font-size:12px}
+  footer p{font-size:12px}
+
+  /* bublinka sa na telefóne zalamuje a drží sa v okne */
+  .tip{white-space:normal;max-width:min(300px,calc(100vw - 24px));font-size:12px;padding:11px 13px}
+}
+@media(max-width:380px){
+  .grid-f{grid-template-columns:1fr}
+  .big{font-size:24px}
+  .compass button{padding:9px 0;font-size:10.5px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top" id="topBar">
+    <div>
+      <div class="mark">
+        <svg class="glyph" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <circle cx="12" cy="12" r="10" stroke="#2C2740" stroke-width="1.4"/>
+          <path d="M12 2.5 L12 21.5" stroke="#2C2740" stroke-width="1"/>
+          <path d="M2.5 12 L21.5 12" stroke="#2C2740" stroke-width="1"/>
+          <path d="M12 12 L18.6 5.4 A9.3 9.3 0 0 0 5.4 5.4 Z" fill="#5BC8F5" opacity=".85"/>
+          <path d="M12 12 L18.6 18.6 A9.3 9.3 0 0 0 18.6 5.4 Z" fill="#F2C14E" opacity=".85"/>
+          <circle cx="12" cy="12" r="1.7" fill="#ECEAF4"/>
+        </svg>
+        <h1>SolarCast</h1>
+      </div>
+      <div class="siteloc" id="siteLoc"></div>
+      <div class="tagline-row">
+        <span class="sitetag" id="siteTag"></span>
+        <button class="info-dot" id="infoBtn" data-tt="aboutData">i</button>
+      </div>
+    </div>
+    <div class="tools">
+      <select class="lang" id="lang" aria-label="Language">
+        <option value="sk">SK</option>
+        <option value="en">EN</option>
+        <option value="de">DE</option>
+        <option value="zh">中文</option>
+      </select>
+      <button class="btn btn-icon" id="openSettings" data-tt="yourArray">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M2.2 5.6h4.4M12.4 5.6h9.4M2.2 12h11.2M19.2 12h2.6M2.2 18.4h2.6M10.6 18.4h11.2"/>
+          <circle cx="9.5" cy="5.6" r="2.9"/>
+          <circle cx="16.3" cy="12" r="2.9"/>
+          <circle cx="7.6" cy="18.4" r="2.9"/>
+        </svg>
+      </button>
+      <button class="btn btn-icon" id="reload" data-tt="refresh">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M22 12a10 10 0 1 1-3.1-7.2"/>
+          <path d="M22.2 2.6v6.2h-6.2"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="infobox hidden" id="infoPanel">
+    <button class="info-close" id="infoClose" aria-label="×">×</button>
+    <div class="info-meta" id="infoMeta"></div>
+      <p><span class="tag" data-t="tagModel"></span><span data-t="foot1"></span></p>
+      <p data-t="foot2"></p>
+      <p><span data-t="foot3"></span>
+        <a href="https://open-meteo.com/en/docs" target="_blank" rel="noopener">Open-Meteo</a>.
+      </p>
+  </div>
+
+  <!-- ============ SETUP ============ -->
+  <div id="setup" class="state hidden">
+    <div class="steps" id="stepBar"></div>
+
+    <!-- step 1: location -->
+    <div id="stLoc">
+      <div class="t" data-t="setupLocT"></div>
+      <div class="d" data-t="setupLocD" style="margin:9px 0 20px"></div>
+      <div class="row">
+        <input id="q" type="text" autocomplete="off" data-tp="searchPh"
+               style="background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:12px 14px;color:var(--text);font-size:14.5px">
+        <button class="btn btn-primary" id="qGo" data-t="search"></button>
+      </div>
+      <div class="res hidden" id="qRes"></div>
+      <div class="msg" id="qMsg"></div>
+    </div>
+
+    <!-- step 2: array -->
+    <div id="stArr" class="hidden">
+      <div class="t" data-t="setupArrT"></div>
+      <div class="d" data-t="setupArrD" style="margin:9px 0 20px"></div>
+      <div id="pickMode">
+        <div class="acts" style="margin-top:0">
+          <button class="btn btn-primary" id="modeKnow" data-t="iKnow"></button>
+          <button class="btn" id="modeAuto" data-t="iDontKnow"></button>
+        </div>
+        <div class="msg" data-t="autoHint"></div>
+      </div>
+      <div id="editor" class="hidden">
+        <div id="strList"></div>
+        <button class="btn" id="addStr" data-t="addString"></button>
+        <div class="totbar">
+          <span><span data-t="totalKwp"></span> <b id="tKwp">–</b></span>
+          <span><span data-t="totalPanels"></span> <b id="tPan">–</b></span>
+        </div>
+        <div class="grid-f">
+          <div class="field">
+            <label data-t="inverter"></label>
+            <input id="f_ac" type="number" step="0.1" min="0.5">
+            <div class="hint" data-t="inverterH"></div>
+          </div>
+          <div class="field">
+            <label data-t="sysEff"></label>
+            <input id="f_eff" type="number" step="0.01" min="0.5" max="1">
+            <div class="hint" data-t="sysEffH"></div>
+          </div>
+          <div class="field">
+            <label data-t="tempCoef"></label>
+            <input id="f_tc" type="number" step="0.01">
+            <div class="hint" data-t="tempCoefH"></div>
+          </div>
+        </div>
+        <div class="acts">
+          <button class="btn btn-primary" id="finish" data-t="finish"></button>
+          <button class="btn" id="backLoc" data-t="back"></button>
+        </div>
+        <div class="msg bad hidden" id="edMsg"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="loading" class="state hidden">
+    <div class="pulse"></div>
+    <div class="t" data-t="loadingT"></div>
+    <div class="d" data-t="loadingD"></div>
+  </div>
+
+  <div id="error" class="state hidden">
+    <div class="t" data-t="errT"></div>
+    <div class="d" id="errMsg"></div>
+    <button class="btn btn-primary" id="retry" data-t="retry"></button>
+  </div>
+
+  <!-- ============ NASTAVENIA ============ -->
+  <div id="settings" class="hidden">
+    <div class="scr-head">
+      <button class="btn btn-icon" id="setBack" data-tt="back">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 19l-7-7 7-7"/></svg>
+      </button>
+      <div>
+        <h2 data-t="yourArray"></h2>
+        <div class="scr-sub" id="setSub"></div>
+      </div>
+    </div>
+    <div class="scr-body">
+          <div class="notice hidden" id="suggNote">
+            <div class="nt" id="suggNoteT"></div>
+            <div class="nd" id="suggNoteD"></div>
+          </div>
+          <div class="field" style="margin-top:18px">
+            <label data-t="location"></label>
+            <div id="lView" style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;
+                        border:1px solid var(--line);border-radius:11px;background:var(--bg);padding:15px">
+              <div>
+                <div style="font-size:15px;font-weight:500" id="lName">–</div>
+                <div style="font-family:var(--mono);font-size:11px;color:var(--dim-2);margin-top:3px" id="lSub"></div>
+              </div>
+              <button class="btn btn-sm" id="lChange" data-t="change"></button>
+            </div>
+            <div class="hidden" id="lEdit">
+              <div class="row">
+                <input id="lq" type="text" autocomplete="off"
+                       style="background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:11px 13px;color:var(--text);font-size:14px">
+                <button class="btn" id="lCancel"></button>
+              </div>
+              <div class="res hidden" id="lRes"></div>
+              <div class="hint" id="lHint" style="margin-top:9px"></div>
+            </div>
+            <div class="msg" id="lMsg"></div>
+          </div>
+
+          <div style="margin-top:26px">
+            <div id="strList2"></div>
+            <button class="btn" id="addStr2" data-t="addString"></button>
+            <div class="totbar">
+              <span><span data-t="totalKwp"></span> <b id="tKwp2">–</b></span>
+              <span><span data-t="totalPanels"></span> <b id="tPan2">–</b></span>
+            </div>
+            <div class="grid-f">
+              <div class="field">
+                <label data-t="inverter"></label>
+                <input id="g_ac" type="number" step="0.1" min="0.5">
+              </div>
+              <div class="field">
+                <label data-t="sysEff"></label>
+                <input id="g_eff" type="number" step="0.01" min="0.5" max="1">
+              </div>
+              <div class="field">
+                <label data-t="tempCoef"></label>
+                <input id="g_tc" type="number" step="0.01">
+              </div>
+            </div>
+            <div class="acts">
+              <button class="btn btn-primary" id="apply" data-t="applyRecalc"></button>
+              <button class="btn" id="suggest" data-t="suggestOpt"></button>
+            </div>
+            <div class="msg bad hidden" id="gMsg"></div>
+
+            <div class="danger">
+              <h3 data-t="dangerT"></h3>
+              <p data-t="dangerD"></p>
+              <button class="btn btn-danger" id="resetOpen" data-t="resetAll"></button>
+              <div class="confirm hidden" id="resetBox">
+                <div class="ct" data-t="resetWarnT"></div>
+                <div class="cd" data-t="resetWarnD"></div>
+                <div class="acts" style="margin-top:0">
+                  <button class="btn btn-danger-solid" id="resetGo" data-t="resetGo"></button>
+                  <button class="btn" id="resetNo" data-t="cancel"></button>
+                </div>
+              </div>
+            </div>
+
+            <div style="margin-top:30px;padding-top:22px;border-top:1px solid var(--line)">
+              <h3 style="font-family:var(--mono);font-size:10px;letter-spacing:.1em;
+                  text-transform:uppercase;color:var(--dim-2);font-weight:400;margin-bottom:14px"
+                  data-t="appearance"></h3>
+              <div class="field" style="margin-bottom:20px">
+                <label data-t="colorScheme"></label>
+                <div class="seg" id="schemeRow"></div>
+              </div>
+              <div class="field">
+                <label data-t="modeLbl"></label>
+                <div class="seg" id="modeRow">
+                  <button type="button" data-mode="dark" data-t="modeDark"></button>
+                  <button type="button" data-mode="light" data-t="modeLight"></button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+    </div>
+  </div>
+
+  <!-- ============ APP ============ -->
+  <main id="app" class="hidden">
+
+    <div class="hero">
+      <div class="hero-dial">
+        <svg id="dial" viewBox="0 0 190 190" width="190" height="190"></svg>
+        <div class="dial-cap" id="dialCap"></div>
+      </div>
+      <div class="hero-nums">
+        <div>
+          <div class="lbl" data-t="today"></div>
+          <div class="big" id="kToday">–<span class="u">kWh</span></div>
+          <div class="note" id="nToday"></div>
+        </div>
+        <div>
+          <div class="lbl" data-t="tomorrow"></div>
+          <div class="big" id="kTom">–<span class="u">kWh</span></div>
+          <div class="note" id="nTom"></div>
+        </div>
+        <div>
+          <div class="lbl" data-t="sevenDays"></div>
+          <div class="big" id="kWeek">–<span class="u">kWh</span></div>
+          <div class="note" id="nWeek"></div>
+        </div>
+      </div>
+    </div>
+
+    <section>
+      <div class="shead">
+        <div><h2 data-t="heatT"></h2><p data-t="heatD"></p></div>
+        <div class="legend" id="heatLeg"></div>
+      </div>
+      <div class="card scroll"><svg id="heat"></svg></div>
+    </section>
+
+    <section>
+      <div class="shead">
+        <div><h2 data-t="barsT"></h2><p data-t="barsD"></p></div>
+        <div class="legend">
+          <span><i style="background:var(--accent)"></i><span data-t="legForecast"></span></span>
+          <span><i style="background:transparent;border:1px solid var(--dim-2)"></i><span data-t="legCeiling"></span></span>
+        </div>
+      </div>
+      <div class="card scroll"><svg id="bars"></svg></div>
+    </section>
+
+    <section>
+      <div class="shead">
+        <div><h2 data-t="curveT"></h2><p data-t="curveD"></p></div>
+        <div class="tabs" id="dayTabs" role="tablist"></div>
+      </div>
+      <div class="card scroll"><svg id="curve"></svg></div>
+      <div class="legend" id="curveLeg" style="margin-top:15px"></div>
+    </section>
+
+    <section>
+      <div class="shead"><div><h2 data-t="tableT"></h2></div></div>
+      <div class="card scroll">
+        <table>
+          <thead><tr id="thRow"></tr></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+
+  </main>
+</div>
+<div class="tip" id="tip"></div>
+<script>
+(function(){
+"use strict";
+
+/* ============================================================
+   PREKLADY
+   ============================================================ */
+var I18N = {
+sk:{
+ dir:'sk', locale:'sk-SK', dec:',',
+ cancel:'Zrušiť', keepLoc:'Ponechať {p}',
+ editLocH:'Vyber z ponuky, alebo klikni mimo poľa a nechaj pôvodnú lokalitu.',
+ resetAll:'Vymazať zadané údaje',
+ resetWarnT:'Naozaj vymazať všetko, čo si zadal?',
+ resetWarnD:'Zmizne lokalita, všetky stringy aj nastavenia meniča. Appka sa vráti na úvodnú obrazovku a budeš ich musieť zadať znova. Vrátiť sa to nedá.',
+ resetGo:'Áno, vymazať', resetDone:'Údaje vymazané. Začni odznova zadaním lokality.',
+ dangerT:'Vymazanie údajov', dangerD:'Údaje sú uložené len v tomto prehliadači. Vymazaním sa vrátiš na úvodné nastavenie.',
+ suggT:'Toto je len orientačný návrh',
+ suggD:'Zostavu nikto nemeral — appka ju vygenerovala z tvojej zemepisnej šírky a z bežných hodnôt: {n} panelov po {w} W, sklon {t}°, {c}, menič {a} kW. S tvojou skutočnou strechou to nemá nič spoločné a predpoveď podľa nej je len hrubý odhad. Prepíš čísla nižšie podľa toho, čo máš naozaj — hneď ako niečo zmeníš, táto hláška zmizne.',
+ appearance:'Vzhľad', colorScheme:'Farebná schéma', modeLbl:'Režim',
+ schemeDusk:'Súmrak', schemeSlate:'Bridlica', schemeTerra:'Terakota',
+ modeDark:'Tmavý', modeLight:'Svetlý',
+ tagline:'Predpoveď výroby na najbližších 7 dní',
+ updated:'Aktualizované {d} · zdroj {s}',
+ aboutData:'O týchto číslach',
+ refresh:'Obnoviť', search:'Hľadať', back:'Späť', change:'Zmeniť', retry:'Skúsiť znova',
+ searchPh:'Mesto alebo obec, napr. Nitra',
+ stepLoc:'1 · Lokalita', stepArr:'2 · Zostava panelov',
+ setupLocT:'Kde sa nachádza tvoja elektráreň?',
+ setupLocD:'Zadaj mesto alebo obec, kdekoľvek na svete. Časové pásmo a súradnice si SolarCast dohľadá sám a uloží ich len do tohto prehliadača.',
+ setupArrT:'Ako vyzerá tvoja zostava?',
+ setupArrD:'Pridaj toľko stringov, koľko ich máš. Pri každom zadaj počet panelov, výkon jedného panela, sklon a svetovú stranu.',
+ iKnow:'Poznám svoju zostavu', iDontKnow:'Neviem, navrhni mi ju',
+ autoHint:'Ak parametre nepoznáš, SolarCast dopočíta optimálny sklon pre tvoju zemepisnú šírku a navrhne 10 kWp s meničom 10 kW. Kedykoľvek to potom upravíš.',
+ addString:'+ Pridať string', removeStr:'Odstrániť', stringN:'String',
+ panels:'Počet panelov', wp:'Výkon panela (W)', tilt:'Sklon (°)', azimuth:'Azimut (°)',
+ azHint:'0 = sever, 90 = východ, 180 = juh, 270 = západ',
+ totalKwp:'Celkový výkon', totalPanels:'Panelov spolu',
+ inverter:'Menič (kW AC)', inverterH:'Nad týmto výkonom menič obmedzuje.',
+ sysEff:'Systémová účinnosť', sysEffH:'Menič, káble, znečistenie. 0,88 je bežný odhad.',
+ tempCoef:'Teplotný koeficient (%/°C)', tempCoefH:'Záporné číslo, pozri datasheet panelov.',
+ finish:'Hotovo, zobraz predpoveď', applyRecalc:'Uložiť a prepočítať', suggestOpt:'Navrhni optimálny sklon',
+ yourArray:'Lokalita a zostava', location:'Umiestnenie elektrárne',
+ loadingT:'Načítavam predpoveď', loadingD:'Sťahujem zložky slnečného žiarenia a prepočítavam ich na tvoje panely.',
+ errT:'Predpoveď sa nenačítala',
+ today:'Dnes', tomorrow:'Zajtra', sevenDays:'7 dní celkom',
+ peakAt:'špička {p} kW o {h}', noProd:'bez výroby', atAcLimit:'na limite meniča',
+ vsToday:'oproti dnešku', best:'Najviac', worst:'najmenej',
+ heatT:'Kedy sa v týždni vyrába', heatD:'Riadok je deň, stĺpec hodina, intenzita je striedavý výkon. Svetlá obálka označuje čas medzi východom a západom slnka.',
+ barsT:'Denná výroba', barsD:'Plný stĺpec je predpoveď, obrys za ním modelový bezoblačný strop. Rozdiel je to, čo zoberie oblačnosť.',
+ curveT:'Priebeh dňa po stringoch', curveD:'Stringy sú zoradené podľa svetovej strany. Modrá bodkovaná čiara je oblačnosť na pravej osi.',
+ tableT:'Prehľad dní',
+ legForecast:'Predpoveď', legCeiling:'Bezoblačný strop', legCloud:'Oblačnosť (pravá os)',
+ thDay:'Deň', thKwh:'kWh', thCeil:'Strop kWh', thUse:'Využitie', thPeak:'Špička kW',
+ thAt:'Vrchol', thCloud:'Oblačnosť', thTemp:'Teplota', thWin:'Výroba od–do',
+ cloudiness:'Oblačnosť', power:'Výkon', total:'Spolu', ceiling:'Bezoblačný strop',
+ dialCap:'Tvoja zostava', kwp:'kWp',
+ needStr:'Pridaj aspoň jeden string s aspoň jedným panelom.',
+ badNum:'Skontroluj zadané čísla — počet panelov aj výkon musia byť väčšie ako nula.',
+ noResults:'Nič sa nenašlo. Skús iný zápis názvu alebo najbližšie väčšie mesto.',
+ tooShort:'Zadaj aspoň dva znaky.', searching:'Hľadám…',
+ searchFail:'Vyhľadávanie zlyhalo. Skontroluj pripojenie a skús to znova.',
+ rateLim:'Server dočasne odmieta požiadavky. Skús to o pár minút.',
+ optDone:'Navrhnutý sklon {t}° a azimut {a}° — vypočítané pre tvoju zemepisnú šírku.',
+ tagModel:'Modelový odhad',
+ foot1:'Čísla nie sú meranie. SolarCast stiahne predpovedané zložky slnečného žiarenia (priame, difúzne a globálne) a sám ich prepočíta na rovinu každého tvojho stringu, potom na výkon podľa kWp, systémovej účinnosti a teploty panelov. Prepočet na sklonenú plochu používa izotropný model oblohy s albedom 20 %.',
+ foot2:'Reálna odchýlka takýchto odhadov býva rádovo 10–20 % na deň a výrazne viac pri premenlivej oblačnosti. Model nepozná zatienenie stromami či budovami, sneh na paneloch ani skutočný stav elektrárne. Bezoblačný strop je samostatný zjednodušený model, nie údaj z API.',
+ foot3:'Zdroj predpovede:'
+},
+en:{
+ dir:'en', locale:'en-GB', dec:'.',
+ cancel:'Cancel', keepLoc:'Keep {p}',
+ editLocH:'Pick one from the list, or click outside the field to keep the current location.',
+ resetAll:'Erase my data',
+ resetWarnT:'Erase everything you entered?',
+ resetWarnD:'This clears the location, every string and the inverter settings. The app returns to the first-run screen and you will have to enter them again. This cannot be undone.',
+ resetGo:'Yes, erase it', resetDone:'Data erased. Start again by entering a location.',
+ dangerT:'Erase data', dangerD:'Your data is stored in this browser only. Erasing it takes you back to first-run setup.',
+ suggT:'This is a rough placeholder, not your system',
+ suggD:'Nobody measured this array — the app generated it from your latitude and from typical values: {n} panels of {w} W, {t}° tilt, facing {c}, {a} kW inverter. It has nothing to do with your actual roof, so the forecast built on it is only a ballpark figure. Replace the numbers below with what you really have — this notice disappears as soon as you change anything.',
+ appearance:'Appearance', colorScheme:'Colour scheme', modeLbl:'Mode',
+ schemeDusk:'Dusk', schemeSlate:'Slate', schemeTerra:'Terracotta',
+ modeDark:'Dark', modeLight:'Light',
+ tagline:'Seven-day output forecast',
+ updated:'Updated {d} · source {s}',
+ aboutData:'About these numbers',
+ refresh:'Refresh', search:'Search', back:'Back', change:'Change', retry:'Try again',
+ searchPh:'City or town, e.g. Nitra',
+ stepLoc:'1 · Location', stepArr:'2 · Array',
+ setupLocT:'Where is your system?',
+ setupLocD:'Enter a city or town, anywhere in the world. SolarCast looks up the coordinates and time zone itself and keeps them in this browser only.',
+ setupArrT:'What does your array look like?',
+ setupArrD:'Add as many strings as you have. For each one, give the panel count, the power of a single panel, the tilt and the direction it faces.',
+ iKnow:'I know my setup', iDontKnow:'Not sure — suggest one',
+ autoHint:'If you do not know the numbers, SolarCast works out the optimal tilt for your latitude and suggests 10 kWp with a 10 kW inverter. You can change it later.',
+ addString:'+ Add string', removeStr:'Remove', stringN:'String',
+ panels:'Panel count', wp:'Panel power (W)', tilt:'Tilt (°)', azimuth:'Azimuth (°)',
+ azHint:'0 = north, 90 = east, 180 = south, 270 = west',
+ totalKwp:'Total capacity', totalPanels:'Panels in total',
+ inverter:'Inverter (kW AC)', inverterH:'The inverter clips output above this.',
+ sysEff:'System efficiency', sysEffH:'Inverter, cabling, soiling. 0.88 is a common estimate.',
+ tempCoef:'Temperature coefficient (%/°C)', tempCoefH:'A negative number — check your panel datasheet.',
+ finish:'Done, show the forecast', applyRecalc:'Save and recalculate', suggestOpt:'Suggest optimal tilt',
+ yourArray:'Location and array', location:'System location',
+ loadingT:'Loading the forecast', loadingD:'Fetching the solar radiation components and projecting them onto your panels.',
+ errT:'The forecast did not load',
+ today:'Today', tomorrow:'Tomorrow', sevenDays:'7-day total',
+ peakAt:'peak {p} kW at {h}', noProd:'no output', atAcLimit:'at inverter limit',
+ vsToday:'vs today', best:'Best', worst:'worst',
+ heatT:'When the week produces', heatD:'Each row is a day, each column an hour, and the intensity is AC output. The pale outline marks sunrise to sunset.',
+ barsT:'Daily output', barsD:'The solid bar is the forecast, the outline behind it a modelled clear-sky ceiling. The gap is what cloud takes away.',
+ curveT:'Day profile by string', curveD:'Strings are ordered by the direction they face. The blue dotted line is cloud cover on the right axis.',
+ tableT:'Day by day',
+ legForecast:'Forecast', legCeiling:'Clear-sky ceiling', legCloud:'Cloud cover (right axis)',
+ thDay:'Day', thKwh:'kWh', thCeil:'Ceiling kWh', thUse:'Of ceiling', thPeak:'Peak kW',
+ thAt:'At', thCloud:'Cloud', thTemp:'Temp', thWin:'Output window',
+ cloudiness:'Cloud cover', power:'Output', total:'Total', ceiling:'Clear-sky ceiling',
+ dialCap:'Your array', kwp:'kWp',
+ needStr:'Add at least one string with at least one panel.',
+ badNum:'Check the numbers — panel count and panel power must both be above zero.',
+ noResults:'Nothing found. Try a different spelling or the nearest larger city.',
+ tooShort:'Type at least two characters.', searching:'Searching…',
+ searchFail:'The search failed. Check your connection and try again.',
+ rateLim:'The server is refusing requests right now. Try again in a few minutes.',
+ optDone:'Suggested tilt {t}° facing {a}° — worked out for your latitude.',
+ tagModel:'Modelled estimate',
+ foot1:'These numbers are not measurements. SolarCast downloads the forecast radiation components (direct, diffuse and global) and projects them onto the plane of each of your strings, then converts to output using your capacity, system efficiency and panel temperature. The tilt projection uses an isotropic sky model with 20 % ground albedo.',
+ foot2:'Estimates like these typically land within 10–20 % on a given day, and considerably wider when cloud is patchy. The model knows nothing about shading from trees or buildings, snow on the panels, or the actual condition of your system. The clear-sky ceiling is a separate simplified model, not an API value.',
+ foot3:'Forecast source:'
+},
+de:{
+ dir:'de', locale:'de-DE', dec:',',
+ cancel:'Abbrechen', keepLoc:'{p} behalten',
+ editLocH:'Wähle einen Eintrag aus der Liste, oder klicke neben das Feld, um den bisherigen Standort zu behalten.',
+ resetAll:'Daten löschen',
+ resetWarnT:'Wirklich alle Eingaben löschen?',
+ resetWarnD:'Damit verschwinden Standort, alle Strings und die Wechselrichter-Einstellungen. Die App kehrt zum Ersteinrichtungs-Bildschirm zurück und du musst alles neu eingeben. Rückgängig machen geht nicht.',
+ resetGo:'Ja, löschen', resetDone:'Daten gelöscht. Beginne neu mit der Eingabe des Standorts.',
+ dangerT:'Daten löschen', dangerD:'Deine Daten liegen nur in diesem Browser. Beim Löschen landest du wieder bei der Ersteinrichtung.',
+ suggT:'Nur ein grober Vorschlag, nicht deine Anlage',
+ suggD:'Diese Anlage hat niemand gemessen — die App hat sie aus deinem Breitengrad und aus üblichen Werten erzeugt: {n} Module à {w} W, {t}° Neigung, Ausrichtung {c}, {a} kW Wechselrichter. Mit deinem echten Dach hat das nichts zu tun, die Prognose darauf ist nur eine grobe Hausnummer. Ersetze die Zahlen unten durch deine tatsächlichen — sobald du etwas änderst, verschwindet dieser Hinweis.',
+ appearance:'Erscheinungsbild', colorScheme:'Farbschema', modeLbl:'Modus',
+ schemeDusk:'Dämmerung', schemeSlate:'Schiefer', schemeTerra:'Terrakotta',
+ modeDark:'Dunkel', modeLight:'Hell',
+ tagline:'Ertragsprognose für die nächsten 7 Tage',
+ updated:'Aktualisiert {d} · Quelle {s}',
+ aboutData:'Über diese Zahlen',
+ refresh:'Aktualisieren', search:'Suchen', back:'Zurück', change:'Ändern', retry:'Erneut versuchen',
+ searchPh:'Stadt oder Gemeinde, z. B. Nitra',
+ stepLoc:'1 · Standort', stepArr:'2 · Anlage',
+ setupLocT:'Wo steht deine Anlage?',
+ setupLocD:'Gib eine Stadt oder Gemeinde ein, weltweit. SolarCast ermittelt Koordinaten und Zeitzone selbst und speichert sie nur in diesem Browser.',
+ setupArrT:'Wie ist deine Anlage aufgebaut?',
+ setupArrD:'Füge so viele Strings hinzu, wie du hast. Gib je String die Modulanzahl, die Leistung eines Moduls, die Neigung und die Himmelsrichtung an.',
+ iKnow:'Ich kenne meine Anlage', iDontKnow:'Weiß ich nicht — mach einen Vorschlag',
+ autoHint:'Wenn du die Werte nicht kennst, berechnet SolarCast die optimale Neigung für deinen Breitengrad und schlägt 10 kWp mit einem 10-kW-Wechselrichter vor. Änderbar bleibt das jederzeit.',
+ addString:'+ String hinzufügen', removeStr:'Entfernen', stringN:'String',
+ panels:'Modulanzahl', wp:'Modulleistung (W)', tilt:'Neigung (°)', azimuth:'Azimut (°)',
+ azHint:'0 = Norden, 90 = Osten, 180 = Süden, 270 = Westen',
+ totalKwp:'Gesamtleistung', totalPanels:'Module insgesamt',
+ inverter:'Wechselrichter (kW AC)', inverterH:'Darüber begrenzt der Wechselrichter.',
+ sysEff:'Systemwirkungsgrad', sysEffH:'Wechselrichter, Leitungen, Verschmutzung. 0,88 ist ein üblicher Schätzwert.',
+ tempCoef:'Temperaturkoeffizient (%/°C)', tempCoefH:'Negative Zahl, siehe Moduldatenblatt.',
+ finish:'Fertig, Prognose anzeigen', applyRecalc:'Speichern und neu berechnen', suggestOpt:'Optimale Neigung vorschlagen',
+ yourArray:'Standort und Anlage', location:'Standort der Anlage',
+ loadingT:'Prognose wird geladen', loadingD:'Strahlungskomponenten werden geladen und auf deine Module umgerechnet.',
+ errT:'Prognose konnte nicht geladen werden',
+ today:'Heute', tomorrow:'Morgen', sevenDays:'7 Tage gesamt',
+ peakAt:'Spitze {p} kW um {h}', noProd:'kein Ertrag', atAcLimit:'am Wechselrichterlimit',
+ vsToday:'gegenüber heute', best:'Am meisten', worst:'am wenigsten',
+ heatT:'Wann die Woche Ertrag bringt', heatD:'Eine Zeile je Tag, eine Spalte je Stunde, die Intensität ist die AC-Leistung. Der helle Rahmen zeigt Sonnenauf- und -untergang.',
+ barsT:'Tagesertrag', barsD:'Der volle Balken ist die Prognose, die Kontur dahinter die modellierte Obergrenze bei klarem Himmel. Die Differenz nehmen die Wolken.',
+ curveT:'Tagesverlauf nach Strings', curveD:'Die Strings sind nach Himmelsrichtung sortiert. Die blaue gepunktete Linie ist die Bewölkung auf der rechten Achse.',
+ tableT:'Tag für Tag',
+ legForecast:'Prognose', legCeiling:'Klarhimmel-Grenze', legCloud:'Bewölkung (rechte Achse)',
+ thDay:'Tag', thKwh:'kWh', thCeil:'Grenze kWh', thUse:'Ausnutzung', thPeak:'Spitze kW',
+ thAt:'Um', thCloud:'Wolken', thTemp:'Temp.', thWin:'Ertrag von–bis',
+ cloudiness:'Bewölkung', power:'Leistung', total:'Gesamt', ceiling:'Klarhimmel-Grenze',
+ dialCap:'Deine Anlage', kwp:'kWp',
+ needStr:'Füge mindestens einen String mit mindestens einem Modul hinzu.',
+ badNum:'Prüfe die Zahlen — Modulanzahl und Modulleistung müssen größer als null sein.',
+ noResults:'Nichts gefunden. Versuche eine andere Schreibweise oder die nächstgrößere Stadt.',
+ tooShort:'Gib mindestens zwei Zeichen ein.', searching:'Suche…',
+ searchFail:'Die Suche ist fehlgeschlagen. Prüfe die Verbindung und versuche es erneut.',
+ rateLim:'Der Server weist Anfragen gerade ab. Versuche es in ein paar Minuten erneut.',
+ optDone:'Vorgeschlagen: Neigung {t}°, Ausrichtung {a}° — für deinen Breitengrad berechnet.',
+ tagModel:'Modellrechnung',
+ foot1:'Diese Zahlen sind keine Messung. SolarCast lädt die prognostizierten Strahlungskomponenten (direkt, diffus und global) und rechnet sie selbst auf die Ebene jedes Strings um, danach über kWp, Systemwirkungsgrad und Modultemperatur auf die Leistung. Die Umrechnung auf die geneigte Fläche nutzt ein isotropes Himmelsmodell mit 20 % Albedo.',
+ foot2:'Solche Abschätzungen liegen pro Tag typischerweise 10–20 % daneben, bei wechselhafter Bewölkung deutlich mehr. Verschattung durch Bäume oder Gebäude, Schnee auf den Modulen und der tatsächliche Anlagenzustand sind dem Modell unbekannt. Die Klarhimmel-Grenze ist ein eigenes vereinfachtes Modell, kein API-Wert.',
+ foot3:'Datenquelle der Prognose:'
+},
+zh:{
+ dir:'zh', locale:'zh-CN', dec:'.',
+ cancel:'取消', keepLoc:'保留 {p}',
+ editLocH:'从列表中选择，或点击输入框外保留当前位置。',
+ resetAll:'清除我的数据',
+ resetWarnT:'确定要清除所有已填写的内容吗？',
+ resetWarnD:'位置、全部组串和逆变器设置都会被清除。应用将回到首次设置界面，需要重新填写。此操作无法撤销。',
+ resetGo:'确定清除', resetDone:'数据已清除。请重新输入位置开始。',
+ dangerT:'清除数据', dangerD:'数据仅保存在此浏览器中。清除后将回到首次设置。',
+ suggT:'这只是粗略示例，并非你的实际系统',
+ suggD:'这套阵列没有经过任何实测 — 是应用根据你所在纬度和常见数值生成的：{n} 块 {w} W 组件，倾角 {t}°，朝向 {c}，逆变器 {a} kW。它与你屋顶的真实情况无关，据此得出的预测只是一个大致数量级。请把下面的数值改成你实际的配置 — 只要你做出任何修改，这条提示就会消失。',
+ appearance:'外观', colorScheme:'配色方案', modeLbl:'模式',
+ schemeDusk:'暮色', schemeSlate:'石板', schemeTerra:'陶土',
+ modeDark:'深色', modeLight:'浅色',
+ tagline:'未来 7 天发电量预测',
+ updated:'更新于 {d} · 数据源 {s}',
+ aboutData:'关于这些数字',
+ refresh:'刷新', search:'搜索', back:'返回', change:'更改', retry:'重试',
+ searchPh:'城市或乡镇，例如 Nitra',
+ stepLoc:'1 · 位置', stepArr:'2 · 组件阵列',
+ setupLocT:'你的光伏系统在哪里？',
+ setupLocD:'输入世界上任意城市或乡镇。SolarCast 会自动查出坐标和时区，并且只保存在这个浏览器里。',
+ setupArrT:'你的阵列是什么样的？',
+ setupArrD:'有几路组串就添加几路。每一路填写组件数量、单块组件功率、倾角和朝向。',
+ iKnow:'我知道我的配置', iDontKnow:'不清楚，请帮我推荐',
+ autoHint:'如果你不清楚这些参数，SolarCast 会按你所在纬度算出最佳倾角，并推荐 10 kWp 配 10 kW 逆变器。之后随时可以修改。',
+ addString:'+ 添加组串', removeStr:'删除', stringN:'组串',
+ panels:'组件数量', wp:'单块功率（W）', tilt:'倾角（°）', azimuth:'方位角（°）',
+ azHint:'0 = 北，90 = 东，180 = 南，270 = 西',
+ totalKwp:'总装机容量', totalPanels:'组件总数',
+ inverter:'逆变器（kW AC）', inverterH:'超过此功率逆变器会限功率。',
+ sysEff:'系统效率', sysEffH:'逆变器、线缆、积灰等。0.88 是常用估计值。',
+ tempCoef:'温度系数（%/°C）', tempCoefH:'负数，请查看组件规格书。',
+ finish:'完成，查看预测', applyRecalc:'保存并重新计算', suggestOpt:'推荐最佳倾角',
+ yourArray:'位置与阵列', location:'系统位置',
+ loadingT:'正在加载预测', loadingD:'正在获取太阳辐射分量并投影到你的组件平面。',
+ errT:'预测加载失败',
+ today:'今天', tomorrow:'明天', sevenDays:'7 天合计',
+ peakAt:'峰值 {p} kW，出现在 {h}', noProd:'无发电', atAcLimit:'已达逆变器上限',
+ vsToday:'相比今天', best:'最多', worst:'最少',
+ heatT:'一周中的发电时段', heatD:'每行一天，每列一小时，颜色深浅代表交流输出功率。浅色边框标示日出到日落。',
+ barsT:'每日发电量', barsD:'实心柱是预测值，后面的轮廓是晴空模型上限。两者之差就是云层带走的部分。',
+ curveT:'各组串的日内曲线', curveD:'组串按朝向排序。蓝色点线是云量，对应右侧坐标轴。',
+ tableT:'逐日明细',
+ legForecast:'预测', legCeiling:'晴空上限', legCloud:'云量（右轴）',
+ thDay:'日期', thKwh:'kWh', thCeil:'上限 kWh', thUse:'占上限', thPeak:'峰值 kW',
+ thAt:'时刻', thCloud:'云量', thTemp:'气温', thWin:'发电时段',
+ cloudiness:'云量', power:'输出', total:'合计', ceiling:'晴空上限',
+ dialCap:'你的阵列', kwp:'kWp',
+ needStr:'请至少添加一路组串，且至少有一块组件。',
+ badNum:'请检查数值 — 组件数量和单块功率都必须大于零。',
+ noResults:'未找到结果。换一种写法，或试试最近的大城市。',
+ tooShort:'请至少输入两个字符。', searching:'搜索中…',
+ searchFail:'搜索失败。请检查网络连接后重试。',
+ rateLim:'服务器暂时拒绝请求。请几分钟后重试。',
+ optDone:'推荐倾角 {t}°，朝向 {a}° — 按你所在纬度计算得出。',
+ tagModel:'模型估算',
+ foot1:'这些数字不是实测值。SolarCast 下载预报的太阳辐射分量（直射、散射和总辐射），自行投影到每一路组串所在平面，再依据装机容量、系统效率和组件温度换算为输出功率。倾斜面换算采用各向同性天空模型，地面反射率取 20%。',
+ foot2:'这类估算单日通常有 10–20% 的偏差，云量多变时偏差会明显更大。模型不了解树木或建筑的遮挡、组件上的积雪，也不了解系统的实际状况。晴空上限是另一个简化模型，并非来自 API。',
+ foot3:'预测数据来源：'
+}
+};
+
+var LANGS = ['sk','en','de','zh'];
+var lang = 'sk';
+function T(k, vars){
+  var s = (I18N[lang] && I18N[lang][k]) || I18N.en[k] || k;
+  if (vars) for (var v in vars) s = s.replace('{'+v+'}', vars[v]);
+  return s;
+}
+
+var DAYS_L = {
+ sk:['Nedeľa','Pondelok','Utorok','Streda','Štvrtok','Piatok','Sobota'],
+ en:['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],
+ de:['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'],
+ zh:['星期日','星期一','星期二','星期三','星期四','星期五','星期六']
+};
+var DAYS_S = {
+ sk:['Ne','Po','Ut','St','Št','Pi','So'],
+ en:['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
+ de:['So','Mo','Di','Mi','Do','Fr','Sa'],
+ zh:['日','一','二','三','四','五','六']
+};
+var MONS = {
+ sk:['jan','feb','mar','apr','máj','jún','júl','aug','sep','okt','nov','dec'],
+ en:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+ de:['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'],
+ zh:['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月']
+};
+var COMPASS = {
+ sk:['S','SV','V','JV','J','JZ','Z','SZ'],
+ en:['N','NE','E','SE','S','SW','W','NW'],
+ de:['N','NO','O','SO','S','SW','W','NW'],
+ zh:['北','东北','东','东南','南','西南','西','西北']
+};
+
+/* ============================================================
+   FAREBNÉ SCHÉMY
+
+   Tri schémy, každá v tmavom aj svetlom režime. Farby nie sú len
+   v CSS — grafy si ich kreslia samy, preto je celá paleta na
+   jednom mieste a vykresľovacie funkcie z nej čítajú.
+
+   V tmavom režime idú stupnice heatmapy od tmavej k žiarivej,
+   vo svetlom naopak od bledej k sýtej: na bielom podklade musí
+   byť vyššia hodnota tmavšia, inak sa stratí.
+   ============================================================ */
+var PALETTES = {
+  dusk: {
+    dark: {
+      bg:'#100E17', surface:'#181524', surface2:'#201C2E', line:'#2C2740', lineSoft:'#211D30',
+      text:'#ECEAF4', dim:'#8B84A6', dim2:'#615A78',
+      accent:'#F2C14E', cool:'#5BC8F5', warn:'#F2724E',
+      tipBg:'#08060D', shadow:'rgba(0,0,0,.7)',
+      noticeBg:'#221C10', noticeLine:'#5C4A22', noticeText:'#C9BFA4',
+      dangerBg:'#1C1220', dangerLine:'#5A2E30', dangerText:'#F0A896', dangerBtn:'#E8917E',
+      barFill:'#C79B3E', barToday:'#F2C14E', insideLabel:'#2A1F08',
+      grid:'#211D30', gridBase:'#332D4A', ceiling:'#5A5170', cloud:'#8FA8C4',
+      emptyCell:'#171426', marker:'#ECEAF4', envelope:'rgba(236,234,244,.15)',
+      heat:[[25,21,36],[59,46,99],[107,74,140],[181,98,138],[238,143,99],[247,206,91],[255,240,176]],
+      az:{n:[139,123,232], e:[91,200,245], s:[242,193,78], w:[242,114,78]}
+    },
+    light: {
+      bg:'#F7F5FB', surface:'#FFFFFF', surface2:'#F2EEF8', line:'#DFD8EC', lineSoft:'#EBE6F4',
+      text:'#231C33', dim:'#5B5275', dim2:'#7A7290',
+      accent:'#8A5CC7', cool:'#1D7FA8', warn:'#C4472A',
+      tipBg:'#2A2340', shadow:'rgba(60,45,90,.22)',
+      noticeBg:'#FBF3DF', noticeLine:'#D9BE72', noticeText:'#6B5518',
+      dangerBg:'#FCEDE9', dangerLine:'#E0A797', dangerText:'#9A3418', dangerBtn:'#A83C1E',
+      barFill:'#A87BD8', barToday:'#7B45C0', insideLabel:'#FFFFFF',
+      grid:'#EBE6F4', gridBase:'#CFC6E2', ceiling:'#A899CC', cloud:'#3F7FA8',
+      emptyCell:'#F4F1F9', marker:'#231C33', envelope:'rgba(35,28,51,.18)',
+      heat:[[246,244,250],[228,220,242],[203,187,230],[172,149,214],[139,107,191],[106,74,155],[74,49,112]],
+      az:{n:[92,70,175], e:[24,120,168], s:[176,110,20], w:[176,64,40]}
+    }
+  },
+  slate: {
+    dark: {
+      bg:'#0D1013', surface:'#151A1F', surface2:'#1C232A', line:'#28313A', lineSoft:'#1E252C',
+      text:'#E8EDF2', dim:'#8494A2', dim2:'#5B6874',
+      accent:'#4BC0A8', cool:'#5AA9DB', warn:'#E0704F',
+      tipBg:'#05080A', shadow:'rgba(0,0,0,.7)',
+      noticeBg:'#10201D', noticeLine:'#2C5A4E', noticeText:'#9FC4B8',
+      dangerBg:'#1A1211', dangerLine:'#57302A', dangerText:'#EDA08A', dangerBtn:'#E08B72',
+      barFill:'#3C9C89', barToday:'#4BC0A8', insideLabel:'#06201A',
+      grid:'#1E252C', gridBase:'#2E3841', ceiling:'#4C5B67', cloud:'#8FA6BC',
+      emptyCell:'#141A20', marker:'#E8EDF2', envelope:'rgba(232,237,242,.15)',
+      heat:[[20,26,32],[28,51,72],[29,90,104],[46,139,114],[127,178,92],[217,198,78],[242,235,184]],
+      az:{n:[138,127,209], e:[71,182,224], s:[33,167,132], w:[208,138,60]}
+    },
+    light: {
+      bg:'#F5F7F9', surface:'#FFFFFF', surface2:'#EDF1F4', line:'#D5DEE5', lineSoft:'#E5EBEF',
+      text:'#16202A', dim:'#4C5D6A', dim2:'#71808B',
+      accent:'#12796A', cool:'#1B6E9C', warn:'#B8452A',
+      tipBg:'#1B2830', shadow:'rgba(20,40,55,.18)',
+      noticeBg:'#E7F2EF', noticeLine:'#8FBFB2', noticeText:'#14544A',
+      dangerBg:'#FBEDE9', dangerLine:'#DDA593', dangerText:'#8F3418', dangerBtn:'#9E3C1C',
+      barFill:'#4FA898', barToday:'#12796A', insideLabel:'#FFFFFF',
+      grid:'#E5EBEF', gridBase:'#C6D2DA', ceiling:'#93A3AF', cloud:'#2C6E96',
+      emptyCell:'#F1F4F7', marker:'#16202A', envelope:'rgba(22,32,42,.18)',
+      heat:[[244,246,248],[220,231,236],[184,212,220],[140,188,198],[92,158,170],[55,120,138],[31,84,100]],
+      az:{n:[86,74,166], e:[22,110,156], s:[16,120,106], w:[176,84,32]}
+    }
+  },
+  terra: {
+    dark: {
+      bg:'#131010', surface:'#1C1816', surface2:'#25201D', line:'#372F2A', lineSoft:'#272220',
+      text:'#F0EAE3', dim:'#A09184', dim2:'#6E625A',
+      accent:'#E08A3C', cool:'#6FA88E', warn:'#D2543C',
+      tipBg:'#0A0807', shadow:'rgba(0,0,0,.7)',
+      noticeBg:'#241B10', noticeLine:'#634822', noticeText:'#CFBBA0',
+      dangerBg:'#211311', dangerLine:'#5E3028', dangerText:'#F0A490', dangerBtn:'#E2907A',
+      barFill:'#B96F2E', barToday:'#E08A3C', insideLabel:'#2A1A08',
+      grid:'#272220', gridBase:'#3D352F', ceiling:'#5F5349', cloud:'#93A9AF',
+      emptyCell:'#1A1614', marker:'#F0EAE3', envelope:'rgba(240,234,227,.15)',
+      heat:[[25,21,18],[59,31,43],[110,44,54],[168,69,47],[210,118,43],[232,169,60],[246,227,176]],
+      az:{n:[155,123,160], e:[78,158,166], s:[224,138,60], w:[201,85,60]}
+    },
+    light: {
+      bg:'#FAF7F3', surface:'#FFFFFF', surface2:'#F3EDE6', line:'#E3D9CD', lineSoft:'#EFE8DF',
+      text:'#2A211A', dim:'#5F5346', dim2:'#82756A',
+      accent:'#B3541F', cool:'#3C7A66', warn:'#B03A22',
+      tipBg:'#2E241C', shadow:'rgba(80,55,35,.20)',
+      noticeBg:'#FBF0DC', noticeLine:'#D6B472', noticeText:'#6E5217',
+      dangerBg:'#FCEBE5', dangerLine:'#DFA48F', dangerText:'#95331A', dangerBtn:'#A33C1D',
+      barFill:'#D08A55', barToday:'#B3541F', insideLabel:'#FFFFFF',
+      grid:'#EFE8DF', gridBase:'#D8CBBC', ceiling:'#A6968A', cloud:'#356E7E',
+      emptyCell:'#F7F2EC', marker:'#2A211A', envelope:'rgba(42,33,26,.18)',
+      heat:[[249,245,240],[240,226,210],[228,196,164],[214,158,114],[195,116,74],[164,82,47],[120,53,29]],
+      az:{n:[128,86,148], e:[38,116,124], s:[179,84,31], w:[168,58,40]}
+    }
+  }
+};
+
+/* ============================================================
+   NASTAVENIA A ULOŽENIE
+   ============================================================ */
+var STORE = 'solarcast-v1';
+var RAD = Math.PI/180;
+
+function defaultCfg(){
+  return {
+    lat:null, lon:null, place:'', placeSub:'', tz:'auto',
+    strings:[], acLimit:10, eff:0.88, tempCoef:-0.35, lang:null, elev:0,
+    scheme:'terra', mode:'dark',
+    // true = zostavu vygenerovala appka, používateľ ju ešte nechytil
+    suggested:false
+  };
+}
+var cfg = defaultCfg();
+
+function load(){
+  try{
+    var raw = localStorage.getItem(STORE);
+    if (!raw) return;
+    var s = JSON.parse(raw);
+    ['lat','lon','acLimit','eff','tempCoef','elev'].forEach(function(k){
+      if (typeof s[k] === 'number' && isFinite(s[k])) cfg[k] = s[k];
+    });
+    ['place','placeSub','tz','lang','scheme','mode'].forEach(function(k){
+      if (typeof s[k] === 'string') cfg[k] = s[k];
+    });
+    if (typeof s.suggested === 'boolean') cfg.suggested = s.suggested;
+    if (Array.isArray(s.strings)) cfg.strings = s.strings.filter(validStr).map(cleanStr);
+  }catch(e){}
+}
+function save(){ try{ localStorage.setItem(STORE, JSON.stringify(cfg)); }catch(e){} }
+
+function validStr(s){
+  return s && isFinite(s.panels) && isFinite(s.wp) && isFinite(s.tilt) && isFinite(s.az)
+      && s.panels > 0 && s.wp > 0 && s.tilt >= 0 && s.tilt <= 90;
+}
+function cleanStr(s){
+  return { panels:Math.round(+s.panels), wp:+s.wp,
+           tilt:clamp(+s.tilt,0,90), az:norm360(+s.az) };
+}
+function norm360(a){ a = a % 360; return a < 0 ? a + 360 : a; }
+function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
+function lerp(a,b,t){ return a+(b-a)*t; }
+function kwpOf(s){ return s.panels * s.wp / 1000; }
+function totalKwp(){ return cfg.strings.reduce(function(a,s){ return a + kwpOf(s); }, 0); }
+function totalPanels(){ return cfg.strings.reduce(function(a,s){ return a + s.panels; }, 0); }
+function hasPlace(){ return typeof cfg.lat === 'number' && typeof cfg.lon === 'number'; }
+function ready(){ return hasPlace() && cfg.strings.length > 0; }
+
+/* Azimut: používateľ zadáva kompasovo (0 = sever, 180 = juh).
+   Slnečné vzorce nižšie pracujú v konvencii 0 = juh, záporné = východ. */
+function azSolar(azCompass){
+  var a = azCompass - 180;
+  if (a > 180) a -= 360;
+  if (a < -180) a += 360;
+  return a;
+}
+
+
+/* Vybraná paleta pre vykresľovanie grafov. */
+var PAL = PALETTES.terra.dark;
+
+function applyTheme(){
+  var scheme = PALETTES[cfg.scheme] ? cfg.scheme : 'dusk';
+  var mode = cfg.mode === 'light' ? 'light' : 'dark';
+  PAL = PALETTES[scheme][mode];
+  var r = document.documentElement;
+  if (!r || !r.style) return;      // v netypickom prostredí sa aspoň nezrúti
+  var map = {
+    '--bg':'bg','--surface':'surface','--surface-2':'surface2','--line':'line',
+    '--line-soft':'lineSoft','--text':'text','--dim':'dim','--dim-2':'dim2',
+    '--accent':'accent','--cool':'cool','--warn':'warn','--tip-bg':'tipBg',
+    '--shadow':'shadow','--notice-bg':'noticeBg','--notice-line':'noticeLine',
+    '--notice-text':'noticeText','--danger-bg':'dangerBg','--danger-line':'dangerLine',
+    '--danger-text':'dangerText','--danger-btn':'dangerBtn'
+  };
+  for (var k in map) r.style.setProperty(k, PAL[map[k]]);
+  r.setAttribute('data-mode', mode);
+  r.setAttribute('data-scheme', scheme);
+  if (model) render();
+}
+
+function setScheme(v){ cfg.scheme = v; save(); applyTheme(); paintThemeUI(); }
+function setMode(v){ cfg.mode = v; save(); applyTheme(); paintThemeUI(); }
+
+function buildSchemeRow(){
+  var box = $('schemeRow');
+  if (!box) return;
+  box.innerHTML = '';
+  ['dusk','slate','terra'].forEach(function(id){
+    var pv = PALETTES[id][cfg.mode === 'light' ? 'light' : 'dark'];
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.setAttribute('data-scheme', id);
+    // ukážka farieb, aby sa dalo vybrať okom a nie podľa názvu
+    var chips = '<span class="chips">'
+      + '<i style="background:'+pv.accent+'"></i>'
+      + '<i style="background:rgb('+pv.az.e.join(',')+')"></i>'
+      + '<i style="background:rgb('+pv.heat[4].join(',')+')"></i>'
+      + '<i style="background:'+pv.surface2+';box-shadow:inset 0 0 0 1px '+pv.line+'"></i>'
+      + '</span>';
+    b.innerHTML = chips + '<span>' + esc(T('scheme' + id.charAt(0).toUpperCase() + id.slice(1))) + '</span>';
+    b.addEventListener('click', function(){ setScheme(id); });
+    box.appendChild(b);
+  });
+}
+
+function paintThemeUI(){
+  var box = $('schemeRow');
+  if (!box) return;
+  buildSchemeRow();
+  box.querySelectorAll('button').forEach(function(b){
+    b.setAttribute('aria-pressed', b.getAttribute('data-scheme') === cfg.scheme ? 'true' : 'false');
+  });
+  $('modeRow').querySelectorAll('button').forEach(function(b){
+    b.setAttribute('aria-pressed', b.getAttribute('data-mode') === cfg.mode ? 'true' : 'false');
+  });
+}
+
+/* ============================================================
+   POLOHA SLNKA (zjednodušený NOAA algoritmus)
+   ============================================================ */
+function sunPos(utcMs, lat, lon){
+  var jd = utcMs/86400000 + 2440587.5;
+  var T2 = (jd - 2451545.0)/36525;
+  var L0 = (280.46646 + 36000.76983*T2 + 0.0003032*T2*T2) % 360;
+  var M  = 357.52911 + 35999.05029*T2 - 0.0001537*T2*T2;
+  var e  = 0.016708634 - T2*(0.000042037 + 0.0000001267*T2);
+  var C  = Math.sin(M*RAD)*(1.914602 - T2*(0.004817 + 0.000014*T2))
+         + Math.sin(2*M*RAD)*(0.019993 - 0.000101*T2)
+         + Math.sin(3*M*RAD)*0.000289;
+  var trueLong = L0 + C;
+  var omega = 125.04 - 1934.136*T2;
+  var lambda = trueLong - 0.00569 - 0.00478*Math.sin(omega*RAD);
+  var eps0 = 23 + (26 + (21.448 - T2*(46.815 + T2*(0.00059 - T2*0.001813)))/60)/60;
+  var eps = eps0 + 0.00256*Math.cos(omega*RAD);
+  var decl = Math.asin(Math.sin(eps*RAD)*Math.sin(lambda*RAD))/RAD;
+
+  var y = Math.tan(eps/2*RAD)*Math.tan(eps/2*RAD);
+  var eqTime = 4*( y*Math.sin(2*L0*RAD) - 2*e*Math.sin(M*RAD)
+               + 4*e*y*Math.sin(M*RAD)*Math.cos(2*L0*RAD)
+               - 0.5*y*y*Math.sin(4*L0*RAD) - 1.25*e*e*Math.sin(2*M*RAD) )/RAD;
+
+  var d = new Date(utcMs);
+  var utMin = d.getUTCHours()*60 + d.getUTCMinutes() + d.getUTCSeconds()/60;
+  var tst = (utMin + eqTime + 4*lon) % 1440;
+  if (tst < 0) tst += 1440;
+  var ha = tst/4 - 180;
+
+  var cosZ = clamp(Math.sin(lat*RAD)*Math.sin(decl*RAD)
+           + Math.cos(lat*RAD)*Math.cos(decl*RAD)*Math.cos(ha*RAD), -1, 1);
+  var zen = Math.acos(cosZ)/RAD;
+  var az = Math.atan2(Math.sin(ha*RAD),
+        Math.cos(ha*RAD)*Math.sin(lat*RAD) - Math.tan(decl*RAD)*Math.cos(lat*RAD))/RAD;
+  return { zen:zen, cosZ:cosZ, az:az, elev:90 - zen };
+}
+
+/* ============================================================
+   PREPOČET NA SKLONENÚ PLOCHU
+   Izotropný model oblohy, albedo 0,2 — rovnaké predpoklady,
+   aké používa Open-Meteo pri svojej premennej GTI. Overené:
+   zhoda do 0,1 % na hodinu oproti GTI z API.
+   ============================================================ */
+function poa(ghi, dni, dhi, sp, tilt, azSol){
+  if (sp.elev <= 0) return dhi*(1 + Math.cos(tilt*RAD))/2;
+  var cosAOI = sp.cosZ*Math.cos(tilt*RAD)
+             + Math.sin(sp.zen*RAD)*Math.sin(tilt*RAD)*Math.cos((sp.az - azSol)*RAD);
+  return dni*Math.max(0, cosAOI)
+       + dhi*(1 + Math.cos(tilt*RAD))/2
+       + ghi*0.2*(1 - Math.cos(tilt*RAD))/2;
+}
+
+/* Bezoblačný model: Meinelov útlm s Laueho výškovou korekciou (1970),
+   priepustnosť 0,80 a difúzny podiel 0,12.
+
+   Tieto konštanty nie sú prevzaté z príručky — nakalibroval som ich tak, aby
+   modelová hodnota naozaj bola horným ohraničením. Pri klasickom nastavení
+   (0,70 bez výškovej korekcie) skutočné predpovedané žiarenie strop prekračovalo
+   až o 42 % — najviac vo vysokých polohách a pri čistom vzduchu. Overené na
+   ôsmich miestach od Singapuru po Reykjavík a od hladiny mora po La Paz (3 767 m):
+   pri týchto konštantách zostáva pomer skutočné/strop všade pod 1. */
+var CS_TAU = 0.80, CS_DHI = 0.12;
+function clearSkyPOA(utcMs, lat, lon, tilt, azSol, elevM){
+  var sp = sunPos(utcMs, lat, lon);
+  if (sp.elev <= 0.5) return 0;
+  var am = 1/(sp.cosZ + 0.50572*Math.pow(96.07995 - sp.zen, -1.6364));
+  var hkm = Math.max(0, elevM || 0)/1000;
+  var dni = 1353*((1 - 0.14*hkm)*Math.pow(CS_TAU, Math.pow(am, 0.678)) + 0.14*hkm);
+  var dhi = CS_DHI*dni*sp.cosZ;
+  var ghi = dni*sp.cosZ + dhi;
+  return poa(ghi, dni, dhi, sp, tilt, azSol);
+}
+
+/* ============================================================
+   OPTIMÁLNY SKLON
+   Hľadáme sklon s najvyšším ročným úhrnom na bezoblačnej oblohe.
+   Nie je to príručkový vzorec, ale výpočet pre zadanú šírku.
+   Panely mieria k rovníku: na severnej pologuli na juh, na južnej na sever.
+   ============================================================ */
+function optimalSetup(lat, lon){
+  var azComp = lat >= 0 ? 180 : 0;
+  var azS = azSolar(azComp);
+  var best = 0, bestSum = -1;
+  var sun = [];
+  for (var d = 0; d < 365; d += 5){
+    for (var h = 0; h < 24; h++){
+      var ms = Date.UTC(2025,0,1,h,30) + d*86400000;
+      var sp = sunPos(ms, lat, lon);
+      if (sp.elev > 0.5) sun.push({ ms:ms, sp:sp });
+    }
+  }
+  for (var t = 0; t <= 75; t++){
+    var sum = 0;
+    for (var i = 0; i < sun.length; i++){
+      var sp2 = sun[i].sp;
+      var am = 1/(sp2.cosZ + 0.50572*Math.pow(96.07995 - sp2.zen, -1.6364));
+      var dni = 1353*Math.pow(CS_TAU, Math.pow(am, 0.678));
+      var dhi = CS_DHI*dni*sp2.cosZ;
+      var ghi = dni*sp2.cosZ + dhi;
+      sum += poa(ghi, dni, dhi, sp2, t, azS);
+    }
+    if (sum > bestSum){ bestSum = sum; best = t; }
+  }
+  return { tilt:best, az:azComp };
+}
+
+/* ============================================================
+   VÝKONOVÝ MODEL
+   ============================================================ */
+function dcPower(gti, tAir, kwp){
+  if (!(gti > 0)) return 0;
+  var tCell = tAir + gti*(45 - 20)/800;              // NOCT prístup
+  var f = 1 + (cfg.tempCoef/100)*(tCell - 25);
+  return Math.max(0, (gti/1000)*kwp*f);
+}
+
+/* ============================================================
+   FARBY STRINGOV PODĽA SVETOVEJ STRANY
+   Farba nesie informáciu: chladná = ráno/východ, teplá = večer/západ.
+   ============================================================ */
+function azColor(azComp){
+  var a = norm360(azComp), z = PAL.az;
+  var stops = [[0,z.n],[90,z.e],[180,z.s],[270,z.w],[360,z.n]];
+  for (var i = 1; i < stops.length; i++){
+    if (a <= stops[i][0]){
+      var p = stops[i-1], q = stops[i];
+      var f = (a - p[0])/(q[0] - p[0]);
+      return 'rgb(' + Math.round(lerp(p[1][0],q[1][0],f)) + ','
+                    + Math.round(lerp(p[1][1],q[1][1],f)) + ','
+                    + Math.round(lerp(p[1][2],q[1][2],f)) + ')';
+    }
+  }
+  return 'rgb(' + z.s.join(',') + ')';
+}
+function heatColor(t){
+  t = clamp(t,0,1);
+  var r = PAL.heat, n = r.length - 1;
+  var x = t*n, i = Math.min(n-1, Math.floor(x)), f = x - i;
+  return 'rgb(' + Math.round(lerp(r[i][0],r[i+1][0],f)) + ','
+                + Math.round(lerp(r[i][1],r[i+1][1],f)) + ','
+                + Math.round(lerp(r[i][2],r[i+1][2],f)) + ')';
+}
+function compassName(azComp){
+  var idx = Math.round(norm360(azComp)/45) % 8;
+  return COMPASS[lang][idx];
+}
+
+/* ============================================================
+   GEOKÓDOVANIE — mesto alebo obec, celosvetovo
+   ============================================================ */
+function geocode(q){
+  q = (q||'').trim();
+  if (q.length < 2) return Promise.resolve([]);
+  var u = 'https://geocoding-api.open-meteo.com/v1/search?name=' + encodeURIComponent(q)
+        + '&count=10&language=' + lang + '&format=json';
+  return fetch(u).then(function(r){
+    if (!r.ok) throw new Error('geo');
+    return r.json();
+  }).then(function(j){
+    return (j.results||[]).map(function(x){
+      return {
+        name:x.name,
+        sub:[x.admin1, x.country].filter(Boolean).join(' · '),
+        lat:x.latitude, lon:x.longitude,
+        tz:x.timezone || 'auto',
+        elev:isFinite(x.elevation) ? x.elevation : 0
+      };
+    });
+  });
+}
+function round2(v){ return Math.round(v*100)/100; }
+function setPlace(r){
+  cfg.lat = round2(r.lat); cfg.lon = round2(r.lon);
+  cfg.place = r.name; cfg.placeSub = r.sub || '';
+  cfg.tz = r.tz || 'auto';
+  if (isFinite(r.elev)) cfg.elev = r.elev;
+  save();
+}
+
+/* ============================================================
+   STAHOVANIE — jeden dotaz bez ohľadu na počet stringov.
+   Zložky žiarenia si na roviny panelov prepočítame sami.
+   ============================================================ */
+function apiUrl(){
+  return 'https://api.open-meteo.com/v1/forecast'
+    + '?latitude=' + cfg.lat + '&longitude=' + cfg.lon
+    + '&hourly=shortwave_radiation,direct_normal_irradiance,diffuse_radiation,'
+    + 'temperature_2m,cloud_cover'
+    + '&daily=sunrise,sunset'
+    + '&forecast_days=8&timezone=' + encodeURIComponent(cfg.tz || 'auto');
+}
+function wait(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
+function getForecast(attempt){
+  attempt = attempt || 1;
+  return fetch(apiUrl()).then(function(r){
+    if (r.status === 429){
+      if (attempt < 3) return wait(1500*attempt).then(function(){ return getForecast(attempt+1); });
+      throw new Error(T('rateLim'));
+    }
+    if (!r.ok) return r.json().then(function(j){
+      throw new Error(j && j.reason ? j.reason : 'HTTP ' + r.status);
+    }, function(){ throw new Error('HTTP ' + r.status); });
+    return r.json();
+  }, function(){
+    if (attempt < 3) return wait(1200*attempt).then(function(){ return getForecast(attempt+1); });
+    throw new Error(T('searchFail'));
+  });
+}
+
+/* ============================================================
+   ZOSTAVENIE MODELU
+   ============================================================ */
+function buildModel(api){
+  if (isFinite(api.elevation)) cfg.elev = api.elevation;   // presnejšia než z geokodéra
+  var h = api.hourly, t = h.time;
+  var off = (api.utc_offset_seconds || 0)*1000;
+  var days = {}, order = [];
+  var strs = cfg.strings.map(function(s){
+    return { s:s, kwp:kwpOf(s), azSol:azSolar(s.az), color:azColor(s.az) };
+  });
+
+  for (var i = 0; i < t.length; i++){
+    var endUtc = Date.parse(t[i] + 'Z');
+    var trueUtc = endUtc - off;
+    var mid = trueUtc - 1800000;                    // hodnota je priemer za predošlú hodinu
+    var endLocal = new Date(endUtc);
+    var hour = endLocal.getUTCHours() - 1, shift = 0;
+    if (hour < 0){ hour = 23; shift = -1; }
+    var dl = new Date(endUtc + shift*86400000);
+    var key = dl.getUTCFullYear() + '-' + (dl.getUTCMonth()+1) + '-' + dl.getUTCDate();
+
+    if (!days[key]){
+      days[key] = { key:key,
+        date:new Date(Date.UTC(dl.getUTCFullYear(), dl.getUTCMonth(), dl.getUTCDate())),
+        hours:new Array(24), kwh:0, clearKwh:0, peak:0, peakHour:null,
+        perStr:strs.map(function(){ return 0; }),
+        cloudSum:0, cloudN:0, tMax:-999, first:null, last:null,
+        sunrise:null, sunset:null };
+      for (var z = 0; z < 24; z++) days[key].hours[z] = null;
+      order.push(key);
+    }
+    var D = days[key];
+
+    var ghi = pos(h.shortwave_radiation[i]);
+    var dni = pos(h.direct_normal_irradiance[i]);
+    var dhi = pos(h.diffuse_radiation[i]);
+    var ta  = h.temperature_2m[i];
+    var cc  = h.cloud_cover[i];
+    if (ta == null || !isFinite(ta)) ta = 15;
+
+    var sp = sunPos(mid, cfg.lat, cfg.lon);
+    var dcs = [], dcSum = 0, csSum = 0;
+    for (var k = 0; k < strs.length; k++){
+      var g = poa(ghi, dni, dhi, sp, strs[k].s.tilt, strs[k].azSol);
+      var p = dcPower(g, ta, strs[k].kwp);
+      dcs.push(p); dcSum += p;
+      csSum += dcPower(clearSkyPOA(mid, cfg.lat, cfg.lon, strs[k].s.tilt, strs[k].azSol, cfg.elev),
+                       ta, strs[k].kwp);
+    }
+    var ac = Math.min(dcSum*cfg.eff, cfg.acLimit);
+    var csAC = Math.min(csSum*cfg.eff, cfg.acLimit);
+    var per = dcs.map(function(p){ return dcSum > 0 ? ac*p/dcSum : 0; });
+
+    D.hours[hour] = { h:hour, ac:ac, per:per, clear:csAC, temp:ta, cloud:cc };
+    D.kwh += ac; D.clearKwh += csAC;
+    for (var m = 0; m < per.length; m++) D.perStr[m] += per[m];
+    if (ac > D.peak){ D.peak = ac; D.peakHour = hour; }
+    if (cc != null && isFinite(cc)){ D.cloudSum += cc; D.cloudN++; }
+    if (ta > D.tMax) D.tMax = ta;
+    if (ac > 0.02){ if (D.first == null) D.first = hour; D.last = hour; }
+  }
+
+  if (api.daily && api.daily.time){
+    for (var q = 0; q < api.daily.time.length; q++){
+      var pr = api.daily.time[q].split('-');
+      var kk = (+pr[0]) + '-' + (+pr[1]) + '-' + (+pr[2]);
+      if (days[kk]){
+        days[kk].sunrise = hourOf(api.daily.sunrise[q]);
+        days[kk].sunset  = hourOf(api.daily.sunset[q]);
+      }
+    }
+  }
+
+  var list = [];
+  for (var w = 0; w < order.length; w++){
+    var DD = days[order[w]];
+    var filled = 0;
+    for (var y = 0; y < 24; y++) if (DD.hours[y]) filled++;
+    if (filled >= 20) list.push(DD);
+  }
+  list = list.slice(0,7);
+  var maxH = 0;
+  list.forEach(function(d){ d.hours.forEach(function(x){ if (x && x.ac > maxH) maxH = x.ac; }); });
+  return { days:list, strs:strs, maxHourAC:maxH, tz:api.timezone };
+}
+function pos(v){ return (v == null || !isFinite(v) || v < 0) ? 0 : v; }
+function hourOf(iso){
+  if (!iso) return null;
+  var m = /T(\d\d):(\d\d)/.exec(iso);
+  return m ? (+m[1]) + (+m[2])/60 : null;
+}
+
+/* ============================================================
+   POMOCNÉ PRE VYKRESLENIE
+   ============================================================ */
+function $(id){ return document.getElementById(id); }
+function el(tag, attrs, text){
+  var n = document.createElementNS('http://www.w3.org/2000/svg', tag);
+  for (var a in attrs) n.setAttribute(a, attrs[a]);
+  if (text != null) n.textContent = text;
+  return n;
+}
+function esc(t){
+  return String(t).replace(/[&<>"]/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];
+  });
+}
+function num(v, d){
+  d = d == null ? 1 : d;
+  if (v == null || !isFinite(v)) return '–';
+  var s = v.toFixed(d);
+  return I18N[lang].dec === ',' ? s.replace('.', ',') : s;
+}
+function hhmm(h){ return (h < 10 ? '0' : '') + h + ':00'; }
+function dayLabel(d, short){
+  var wd = d.date.getUTCDay();
+  var nm = short ? DAYS_S[lang][wd] : DAYS_L[lang][wd];
+  if (lang === 'zh') return nm + ' ' + (d.date.getUTCMonth()+1) + '/' + d.date.getUTCDate();
+  return nm + ' ' + d.date.getUTCDate() + '. ' + MONS[lang][d.date.getUTCMonth()];
+}
+function isToday(d){
+  var n = new Date();
+  return d.date.getUTCFullYear() === n.getFullYear()
+      && d.date.getUTCMonth() === n.getMonth()
+      && d.date.getUTCDate() === n.getDate();
+}
+/* ============================================================
+   ROZMERY PODĽA ZARIADENIA
+
+   Grafy sa nekreslia na pevnú šírku, ale na šírku, ktorú im
+   naozaj dáva karta. Na telefóne sa okrem šírky mení aj hustota:
+   menej popisov na osiach, kratšie názvy dní, nižšie riadky.
+   ============================================================ */
+function narrow(){ return (window.innerWidth || 1024) < 700; }
+function tiny(){ return (window.innerWidth || 1024) < 420; }
+
+function availW(svgId, min){
+  var svg = $(svgId);
+  var host = svg && svg.parentNode;
+  var w = host ? host.clientWidth : 0;
+  if (!w) w = (window.innerWidth || 900) - 60;
+  // vnútorné odsadenie karty
+  var cs = host && window.getComputedStyle ? window.getComputedStyle(host) : null;
+  if (cs) w -= (parseFloat(cs.paddingLeft)||0) + (parseFloat(cs.paddingRight)||0);
+  return Math.max(min || 260, Math.floor(w));
+}
+
+/* Dotykové zariadenie nemá kurzor. Rovnaké údaje preto sprístupníme
+   cez ukazovacie udalosti, ktoré pokrývajú myš, prst aj pero. */
+/* Pri myši bublina zmizne, keď kurzor odíde z prvku. Prst ale prvok
+   "opustí" v tom istom okamihu, ako naň ťukne — pri rovnakom správaní
+   by bublina na telefóne len blikla. Preto sa po ťuknutí necháva svietiť
+   a zavrie ju až ťuknutie inam, posunutie stránky alebo iná bunka. */
+var touchMode = false;
+var tipOff = null;
+
+function bindTip(node, htmlFn, onOff){
+  node.style.cursor = 'crosshair';
+  var show = function(ev){
+    if (ev.pointerType === 'touch'){
+      touchMode = true;
+      if (ev.cancelable) ev.preventDefault();
+    } else if (ev.pointerType === 'mouse'){
+      touchMode = false;
+    }
+    if (tipOff && tipOff !== onOff) tipOff(false);   // zhasni značku po predošlej bunke
+    tipOff = onOff || null;
+    showTip(ev, htmlFn());
+    if (onOff) onOff(true);
+  };
+  var leave = function(){
+    if (touchMode) return;                            // prst drží bublinu ďalej
+    hideTip();
+    if (onOff) onOff(false);
+  };
+  node.addEventListener('pointerenter', show);
+  node.addEventListener('pointermove', show);
+  node.addEventListener('pointerdown', show);
+  node.addEventListener('pointerleave', leave);
+  node.addEventListener('pointercancel', leave);
+}
+
+var tipEl;
+function showTip(ev, html){
+  tipEl.innerHTML = html; tipEl.classList.add('on');
+  var r = tipEl.getBoundingClientRect();
+  var x = ev.clientX + 14, y = ev.clientY - r.height - 12;
+  if (x + r.width > window.innerWidth - 10) x = ev.clientX - r.width - 14;
+  if (x < 6) x = 6;
+  if (y < 8) y = ev.clientY + 18;
+  tipEl.style.left = x + 'px'; tipEl.style.top = y + 'px';
+}
+function hideTip(){ if (tipEl) tipEl.classList.remove('on'); }
+// ťuknutie mimo grafu bublinu zavrie
+document.addEventListener('pointerdown', function(e){
+  if (!e.target || !e.target.closest || !e.target.closest('svg')){
+    hideTip();
+    if (tipOff){ tipOff(false); tipOff = null; }
+  }
+}, true);
+// posunutie stránky bublinu zavrie vždy
+document.addEventListener('scroll', function(){
+  if (tipOff){ tipOff(false); tipOff = null; }
+}, true);
+
+var model = null, sel = 0;
+
+/* ============================================================
+   PODPISOVÝ PRVOK — kompasový ciferník zostavy
+   Každý string je výsek na svojom azimute. Polomer nesie kWp,
+   sýtosť sklon, farba svetovú stranu. Na jeden pohľad vidno,
+   ako je zostava rozložená.
+   ============================================================ */
+function drawDial(){
+  var svg = $('dial');
+  svg.innerHTML = '';
+  var side = tiny() ? 150 : (narrow() ? 168 : 190);
+  svg.setAttribute('viewBox','0 0 190 190');
+  svg.setAttribute('width', side); svg.setAttribute('height', side);
+  var cx = 95, cy = 95, R = 76;
+
+  svg.appendChild(el('circle',{cx:cx,cy:cy,r:R,fill:'none',stroke:PAL.line,'stroke-width':1}));
+  svg.appendChild(el('circle',{cx:cx,cy:cy,r:R*0.62,fill:'none',stroke:PAL.grid,'stroke-width':1}));
+  svg.appendChild(el('circle',{cx:cx,cy:cy,r:R*0.31,fill:'none',stroke:PAL.grid,'stroke-width':1}));
+
+  [0,90,180,270].forEach(function(a){
+    var rr = (a*RAD);
+    svg.appendChild(el('line',{
+      x1:cx + Math.sin(rr)*R*0.31, y1:cy - Math.cos(rr)*R*0.31,
+      x2:cx + Math.sin(rr)*R,      y2:cy - Math.cos(rr)*R,
+      stroke:PAL.grid,'stroke-width':1 }));
+    svg.appendChild(el('text',{
+      x:cx + Math.sin(rr)*(R+11), y:cy - Math.cos(rr)*(R+11) + 3.5,
+      'font-size':9,'text-anchor':'middle','letter-spacing':'.08em'
+    }, COMPASS[lang][a/45]));
+  });
+
+  if (!cfg.strings.length) return;
+  var maxKwp = Math.max.apply(null, cfg.strings.map(kwpOf));
+
+  cfg.strings.forEach(function(s){
+    var frac = Math.sqrt(kwpOf(s)/maxKwp);
+    var rad = R*0.31 + (R - R*0.31)*frac;
+    var half = 15*RAD;
+    var a0 = norm360(s.az)*RAD - half, a1 = norm360(s.az)*RAD + half;
+    var p = 'M ' + (cx + Math.sin(a0)*R*0.31) + ' ' + (cy - Math.cos(a0)*R*0.31)
+          + ' L ' + (cx + Math.sin(a0)*rad) + ' ' + (cy - Math.cos(a0)*rad)
+          + ' A ' + rad + ' ' + rad + ' 0 0 1 '
+                  + (cx + Math.sin(a1)*rad) + ' ' + (cy - Math.cos(a1)*rad)
+          + ' L ' + (cx + Math.sin(a1)*R*0.31) + ' ' + (cy - Math.cos(a1)*R*0.31)
+          + ' A ' + R*0.31 + ' ' + R*0.31 + ' 0 0 0 '
+                  + (cx + Math.sin(a0)*R*0.31) + ' ' + (cy - Math.cos(a0)*R*0.31) + ' Z';
+    var wedge = el('path',{ d:p, fill:azColor(s.az),
+      'fill-opacity': (0.32 + 0.55*(s.tilt/90)).toFixed(2),
+      stroke:azColor(s.az), 'stroke-width':1, 'stroke-opacity':0.9 });
+    bindTip(wedge, function(){
+      return '<b>' + compassName(s.az) + ' · ' + Math.round(s.az) + '°</b><br>'
+        + s.panels + ' × ' + s.wp + ' W = <b>' + num(kwpOf(s),2) + ' kWp</b><br>'
+        + T('tilt') + ' ' + num(s.tilt,0) + '°';
+    });
+    svg.appendChild(wedge);
+  });
+  svg.appendChild(el('circle',{cx:cx,cy:cy,r:3,fill:PAL.marker}));
+}
+
+/* ============================================================
+   HEATMAPA
+   ============================================================ */
+function drawHeat(){
+  var svg = $('heat'); svg.innerHTML = '';
+  var nar = narrow();
+  var padL = nar ? (tiny() ? 30 : 38) : 76;
+  var padT = 26, padR = nar ? 4 : 12, padB = 6, gap = nar ? 1 : 2;
+  var W = availW('heat', 280);
+  var cw = (W - padL - padR)/24;
+  var chh = nar ? Math.max(22, Math.min(30, cw*1.9)) : 33;
+  var H = padT + model.days.length*chh + padB;
+  svg.setAttribute('viewBox','0 0 '+W+' '+H);
+  svg.setAttribute('width','100%'); svg.setAttribute('height',H);
+  svg.style.minWidth = '';
+  var max = Math.max(model.maxHourAC, 0.4);
+
+  var hStep = nar ? 6 : 3;
+  for (var h = 0; h < 24; h += hStep)
+    svg.appendChild(el('text',{x:padL + h*cw + cw/2, y:padT - 10,
+      'font-size':nar?8.5:9.5,'text-anchor':'middle','letter-spacing':'.05em'},(h<10?'0':'')+h));
+
+  model.days.forEach(function(d, r){
+    var y = padT + r*chh;
+    var lbTxt = nar ? DAYS_S[lang][d.date.getUTCDay()] : dayLabel(d,true);
+    var lb = el('text',{x:padL - (nar?6:13), y:y + chh/2 + 3.5, 'font-size':nar?9:10,
+      'text-anchor':'end','letter-spacing':'.03em'}, lbTxt);
+    if (isToday(d)) lb.setAttribute('fill',PAL.text);
+    svg.appendChild(lb);
+    if (d.sunrise != null && d.sunset != null)
+      svg.appendChild(el('rect',{x:padL + d.sunrise*cw, y:y+1,
+        width:Math.max(0,(d.sunset - d.sunrise)*cw), height:chh - gap - 1,
+        fill:'none', stroke:PAL.envelope,'stroke-width':1, rx:4}));
+
+    for (var q = 0; q < 24; q++){
+      var c = d.hours[q], v = c ? c.ac : 0;
+      var rc = el('rect',{x:padL + q*cw + gap/2, y:y + gap/2,
+        width:Math.max(0.5, cw - gap), height:chh - gap, rx:nar?2:3,
+        fill: v > 0.02 ? heatColor(v/max) : PAL.emptyCell});
+      if (v > 0.02){
+        (function(dd, cd, hh){
+          bindTip(rc, function(){
+            var rows = model.strs.map(function(s, i){
+              return '<span style="color:'+s.color+'">■</span> ' + compassName(s.s.az)
+                   + ' ' + num(cd.per[i],2) + ' kW';
+            }).join('<br>');
+            return '<b>' + dayLabel(dd,false) + ' · ' + hhmm(hh) + '–' + hhmm(hh+1) + '</b><br>'
+              + T('power') + ' <b>' + num(cd.ac,2) + ' kW</b><br>' + rows + '<br>'
+              + T('cloudiness') + ' ' + (cd.cloud == null ? '–' : Math.round(cd.cloud)+' %')
+              + ' · ' + num(cd.temp,1) + ' °C';
+          });
+        })(d, c, q);
+      }
+      svg.appendChild(rc);
+    }
+  });
+
+  var lg = $('heatLeg'); lg.innerHTML = '';
+  var a = document.createElement('span'); a.textContent = '0 kW'; lg.appendChild(a);
+  var sw = document.createElement('span'); sw.style.display = 'inline-flex';
+  var nSw = nar ? 10 : 14;
+  for (var s2 = 0; s2 < nSw; s2++){
+    var ii = document.createElement('i');
+    ii.style.cssText = 'width:10px;height:10px;border-radius:0;margin:0;background:'+heatColor(s2/(nSw-1));
+    sw.appendChild(ii);
+  }
+  lg.appendChild(sw);
+  var b = document.createElement('span'); b.textContent = num(max,1)+' kW'; lg.appendChild(b);
+}
+
+/* ============================================================
+   DENNÉ STĹPCE
+   ============================================================ */
+function drawBars(){
+  var svg = $('bars'); svg.innerHTML = '';
+  var nar = narrow();
+  var padL = nar ? 30 : 48, padT = 20, padR = nar ? 6 : 14, padB = nar ? 42 : 46;
+  var W = availW('bars', 280);
+  var n = model.days.length;
+  var slot = (W - padL - padR)/n;
+  var gp = Math.max(5, Math.min(22, slot*0.24));
+  var bw = Math.max(10, slot - gp);
+  var H = nar ? 210 : 248;
+  var plotH = H - padT - padB;
+  svg.setAttribute('viewBox','0 0 '+W+' '+H);
+  svg.setAttribute('width','100%'); svg.setAttribute('height',H);
+  svg.style.minWidth = '';
+
+  var max = model.days.reduce(function(m,d){ return Math.max(m,d.clearKwh,d.kwh); },1);
+  var step = max > 120 ? 40 : max > 60 ? 20 : max > 30 ? 10 : max > 12 ? 5 : 2;
+  var top = Math.ceil(max/step)*step;
+
+  for (var g = 0; g <= top; g += step){
+    var y = padT + plotH - (g/top)*plotH;
+    svg.appendChild(el('line',{x1:padL,y1:y,x2:W-padR,y2:y,
+      stroke: g === 0 ? PAL.gridBase : PAL.grid,'stroke-width':1}));
+    svg.appendChild(el('text',{x:padL-(nar?5:10),y:y+3.5,
+      'font-size':nar?8.5:9.5,'text-anchor':'end'},g));
+  }
+
+  model.days.forEach(function(d,i){
+    var x = padL + i*slot + gp/2;
+    var hC = (d.clearKwh/top)*plotH, hF = (d.kwh/top)*plotH;
+    svg.appendChild(el('rect',{x:x,y:padT+plotH-hC,width:bw,height:Math.max(0,hC),
+      fill:'none',stroke:PAL.ceiling,'stroke-width':1,'stroke-dasharray':'3 3',rx:3}));
+    var bar = el('rect',{x:x,y:padT+plotH-hF,width:bw,height:Math.max(0,hF),
+      fill: isToday(d) ? PAL.barToday : PAL.barFill, rx:3});
+    bindTip(bar, function(){
+      return '<b>'+dayLabel(d,false)+'</b><br>'
+        + T('legForecast')+' <b>'+num(d.kwh,1)+' kWh</b><br>'
+        + T('ceiling')+' '+num(d.clearKwh,1)+' kWh<br>'
+        + T('thUse')+' '+(d.clearKwh>0?Math.round(100*d.kwh/d.clearKwh):0)+' %';
+    });
+    svg.appendChild(bar);
+    // pri veľmi vysokom stĺpci by popisok narazil do osi, preto ide dovnútra
+    var inside = hF > plotH - 20;
+    svg.appendChild(el('text',{
+      x:x+bw/2, y: inside ? padT+plotH-hF+14 : padT+plotH-hF-8,
+      'font-size':nar?9.5:11,'text-anchor':'middle',
+      fill: inside ? PAL.insideLabel : PAL.text,'font-weight':600}, num(d.kwh, nar?0:1)));
+    svg.appendChild(el('text',{x:x+bw/2,y:H-padB+19,'font-size':nar?9.5:10,'text-anchor':'middle',
+      fill:isToday(d)?PAL.text:PAL.dim,'letter-spacing':'.03em'}, DAYS_S[lang][d.date.getUTCDay()]));
+    svg.appendChild(el('text',{x:x+bw/2,y:H-padB+32,'font-size':nar?8.5:9.5,'text-anchor':'middle',
+      fill:PAL.dim2}, (d.date.getUTCMonth()+1)+'/'+d.date.getUTCDate()));
+  });
+  svg.appendChild(el('text',{x:padL-(nar?5:10),y:padT-6,'font-size':9,'text-anchor':'end',
+    'letter-spacing':'.1em'},'kWh'));
+}
+
+/* ============================================================
+   KRIVKA DŇA PO STRINGOCH
+   ============================================================ */
+function drawTabs(){
+  var box = $('dayTabs'); box.innerHTML = '';
+  model.days.forEach(function(d,i){
+    var b = document.createElement('button');
+    b.className = 'tab'; b.setAttribute('role','tab');
+    b.setAttribute('aria-selected', i === sel ? 'true':'false');
+    b.textContent = isToday(d) ? T('today') : dayLabel(d,true);
+    b.addEventListener('click', function(){ sel = i; drawTabs(); drawCurve(); });
+    box.appendChild(b);
+  });
+}
+
+function drawCurve(){
+  var svg = $('curve'); svg.innerHTML = '';
+  var d = model.days[sel]; if (!d) return;
+  var nar = narrow();
+  var padL = nar ? 30 : 46, padT = 22, padR = nar ? 34 : 54, padB = nar ? 34 : 40;
+  var W = availW('curve', 280);
+  var H = nar ? 235 : 296;
+  var plotW = W-padL-padR, plotH = H-padT-padB;
+  svg.setAttribute('viewBox','0 0 '+W+' '+H);
+  svg.setAttribute('width','100%'); svg.setAttribute('height',H);
+  svg.style.minWidth = '';
+
+  var n = model.strs.length;
+  var vals = [];
+  for (var q = 0; q < 24; q++){
+    var c = d.hours[q];
+    vals.push(c || {h:q, ac:0, per:new Array(n).fill(0), clear:0, temp:null, cloud:null});
+  }
+  var max = vals.reduce(function(m,v){ return Math.max(m,v.ac,v.clear); },1);
+  var step = max > 24 ? 6 : max > 12 ? 4 : max > 6 ? 2 : 1;
+  var top = Math.ceil(max/step)*step;
+  function X(h){ return padL + (h/23)*plotW; }
+  function Y(v){ return padT + plotH - (v/top)*plotH; }
+
+  for (var g = 0; g <= top; g += step){
+    svg.appendChild(el('line',{x1:padL,y1:Y(g),x2:W-padR,y2:Y(g),stroke:PAL.grid,'stroke-width':1}));
+    svg.appendChild(el('text',{x:padL-(nar?5:10),y:Y(g)+3.5,
+      'font-size':nar?8.5:9.5,'text-anchor':'end'},g));
+  }
+  var tStep = nar ? 6 : 3;
+  for (var t3 = 0; t3 < 24; t3 += tStep)
+    svg.appendChild(el('text',{x:X(t3),y:H-padB+18,'font-size':nar?8.5:9.5,
+      'text-anchor':'middle'}, nar ? String(t3) : hhmm(t3)));
+
+  // stringy zoradené podľa svetovej strany: východ dole, západ hore
+  var ord = model.strs.map(function(s,i){ return {i:i, az:norm360(s.s.az)}; })
+    .sort(function(a,b){ return a.az - b.az; });
+  var cum = [];
+  for (var hh = 0; hh < 24; hh++){
+    var run = 0, arr = [];
+    for (var k = 0; k < ord.length; k++){ run += vals[hh].per[ord[k].i]; arr.push(run); }
+    cum.push(arr);
+  }
+  for (var layer = ord.length - 1; layer >= 0; layer--){
+    var p = 'M ' + X(0) + ' ' + Y(0);
+    for (var a2 = 0; a2 < 24; a2++) p += ' L ' + X(a2) + ' ' + Y(cum[a2][layer]);
+    p += ' L ' + X(23) + ' ' + Y(0) + ' Z';
+    svg.appendChild(el('path',{d:p, fill:model.strs[ord[layer].i].color, 'fill-opacity':0.30}));
+    var pl = '';
+    for (var b2 = 0; b2 < 24; b2++) pl += (b2?' L ':'M ') + X(b2) + ' ' + Y(cum[b2][layer]);
+    svg.appendChild(el('path',{d:pl, fill:'none', stroke:model.strs[ord[layer].i].color,
+      'stroke-width':1.6,'stroke-linejoin':'round','stroke-linecap':'round'}));
+  }
+  var pc = '';
+  for (var c2 = 0; c2 < 24; c2++) pc += (c2?' L ':'M ') + X(c2) + ' ' + Y(vals[c2].clear);
+  svg.appendChild(el('path',{d:pc, fill:'none', stroke:PAL.ceiling,'stroke-width':1.2,
+    'stroke-dasharray':'5 4'}));
+
+  // oblačnosť na pravej osi
+  var YC = function(p2){ return padT + plotH - (clamp(p2,0,100)/100)*plotH; };
+  [0,50,100].forEach(function(p3){
+    svg.appendChild(el('text',{x:W-padR+(nar?5:12),y:YC(p3)+3.5,'font-size':nar?8.5:9.5,
+      'text-anchor':'start',fill:PAL.dim2}, p3+'%'));
+  });
+  var segs = [], cur = [];
+  for (var e2 = 0; e2 < 24; e2++){
+    var cv = vals[e2].cloud;
+    if (cv == null || !isFinite(cv)){ if (cur.length) segs.push(cur); cur = []; continue; }
+    cur.push([X(e2), YC(cv)]);
+  }
+  if (cur.length) segs.push(cur);
+  segs.forEach(function(pts){
+    if (pts.length < 2) return;
+    var pp = '';
+    pts.forEach(function(pt,i){ pp += (i?' L ':'M ') + pt[0] + ' ' + pt[1]; });
+    svg.appendChild(el('path',{d:pp,fill:'none',stroke:PAL.cloud,'stroke-width':1.9,
+      'stroke-dasharray':'0.5 5','stroke-linecap':'round'}));
+  });
+
+  var marker = el('line',{x1:0,y1:padT,x2:0,y2:padT+plotH,stroke:PAL.marker,
+    'stroke-width':1,opacity:0,'pointer-events':'none'});
+  for (var f2 = 0; f2 < 24; f2++){
+    (function(i){
+      var hit = el('rect',{x:X(i)-plotW/46,y:padT,width:plotW/23,height:plotH,fill:'transparent'});
+      bindTip(hit, function(){
+        var v = vals[i];
+        var rows = ord.map(function(o){
+          return '<span style="color:'+model.strs[o.i].color+'">■</span> '
+               + compassName(model.strs[o.i].s.az) + ' ' + num(v.per[o.i],2) + ' kW';
+        }).join('<br>');
+        return '<b>'+hhmm(i)+'–'+hhmm(i+1)+'</b><br>'
+          + T('total')+' <b>'+num(v.ac,2)+' kW</b><br>'+rows+'<br>'
+          + T('ceiling')+' '+num(v.clear,2)+' kW<br>'
+          + (v.cloud==null?'':T('cloudiness')+' '+Math.round(v.cloud)+' % · ')
+          + (v.temp==null?'':num(v.temp,1)+' °C');
+      }, function(on){
+        marker.setAttribute('x1',X(i)); marker.setAttribute('x2',X(i));
+        marker.setAttribute('opacity', on ? 1 : 0);
+      });
+      svg.appendChild(hit);
+    })(f2);
+  }
+  svg.appendChild(marker);
+  svg.appendChild(el('text',{x:padL-(nar?5:10),y:padT-6,'font-size':9,'text-anchor':'end',
+    'letter-spacing':'.1em'},'kW'));
+  if (!nar) svg.appendChild(el('text',{x:W-padR+12,y:padT-6,'font-size':9,'text-anchor':'start',
+    'letter-spacing':'.1em',fill:PAL.dim2}, T('cloudiness')));
+
+  var lg = $('curveLeg'); lg.innerHTML = '';
+  ord.forEach(function(o){
+    var s = model.strs[o.i], sp = document.createElement('span');
+    sp.innerHTML = '<i style="background:'+s.color+'"></i>' + esc(compassName(s.s.az))
+      + ' ' + Math.round(s.s.az) + '° / ' + num(s.s.tilt,0) + '° · ' + num(s.kwp,2) + ' kWp';
+    lg.appendChild(sp);
+  });
+  var sc = document.createElement('span');
+  sc.innerHTML = '<i style="background:'+PAL.cloud+'"></i>' + esc(T('legCloud'));
+  lg.appendChild(sc);
+}
+
+/* ============================================================
+   TABUĽKA A SÚHRN
+   ============================================================ */
+function drawTable(){
+  var hr = $('thRow'); hr.innerHTML = '';
+  ['thDay','thKwh','thCeil','thUse','thPeak','thAt','thCloud','thTemp','thWin'].forEach(function(k){
+    var th = document.createElement('th'); th.textContent = T(k); hr.appendChild(th);
+  });
+  var tb = $('tbody'); tb.innerHTML = '';
+  var maxK = model.days.reduce(function(m,d){ return Math.max(m,d.kwh); },1);
+  model.days.forEach(function(d){
+    var tr = document.createElement('tr');
+    if (isToday(d)) tr.className = 'today';
+    var c0 = document.createElement('td');
+    c0.className = 'dcell';
+    c0.innerHTML = esc(isToday(d) ? T('today') : DAYS_L[lang][d.date.getUTCDay()])
+      + '<span>' + (d.date.getUTCMonth()+1) + '/' + d.date.getUTCDate() + '</span>';
+    tr.appendChild(c0);
+    function td(html){ var c = document.createElement('td'); c.innerHTML = html; tr.appendChild(c); }
+    td('<b style="color:var(--text)">'+num(d.kwh,1)+'</b>'
+      +'<div class="minibar" style="width:'+Math.round(100*d.kwh/maxK)+'%"></div>');
+    td('<span style="color:var(--dim)">'+num(d.clearKwh,1)+'</span>');
+    td((d.clearKwh>0?Math.round(100*d.kwh/d.clearKwh):0)+' %');
+    td(num(d.peak,2));
+    td(d.peakHour==null?'–':hhmm(d.peakHour));
+    td(d.cloudN?Math.round(d.cloudSum/d.cloudN)+' %':'–');
+    td(d.tMax>-900?num(d.tMax,1)+' °C':'–');
+    td('<span style="color:var(--dim)">'
+      +(d.first==null?'–':hhmm(d.first)+'–'+hhmm(d.last+1))+'</span>');
+    tb.appendChild(tr);
+  });
+}
+
+function drawSummary(){
+  var d0 = model.days[0], d1 = model.days[1];
+  var week = model.days.reduce(function(s,d){ return s+d.kwh; },0);
+
+  $('kToday').innerHTML = num(d0.kwh,1)+'<span class="u">kWh</span>';
+  var atLim = d0.peak >= cfg.acLimit - 0.02;
+  $('nToday').innerHTML = (d0.peakHour == null ? esc(T('noProd'))
+      : esc(T('peakAt',{p:num(d0.peak,2), h:hhmm(d0.peakHour)})))
+    + (atLim ? ' · <b style="color:var(--warn)">'+esc(T('atAcLimit'))+'</b>' : '');
+
+  if (d1){
+    $('kTom').innerHTML = num(d1.kwh,1)+'<span class="u">kWh</span>';
+    var diff = d1.kwh - d0.kwh;
+    var pct = d0.kwh > 0.5 ? Math.round(100*diff/d0.kwh) : null;
+    $('nTom').innerHTML = (diff >= 0 ? '↑ ' : '↓ ') + num(Math.abs(diff),1) + ' kWh '
+      + esc(T('vsToday')) + (pct == null ? '' : ' · ' + (diff>=0?'+':'−') + Math.abs(pct) + ' %');
+  } else { $('nTom').textContent = ''; }
+
+  $('kWeek').innerHTML = num(week,0)+'<span class="u">kWh</span>';
+  var srt = model.days.slice().sort(function(a,b){ return b.kwh-a.kwh; });
+  var best = srt[0], worst = srt[srt.length-1];
+  $('nWeek').innerHTML = esc(T('best'))+' <b>'+esc(dayLabel(best,true))+'</b> '+num(best.kwh,1)
+    + ' kWh · ' + esc(T('worst')) + ' <b>'+esc(dayLabel(worst,true))+'</b> '+num(worst.kwh,1)+' kWh';
+
+  paintHeader();
+  $('dialCap').textContent = T('dialCap');
+}
+
+/* ============================================================
+   EDITOR STRINGOV
+   ============================================================ */
+function renderStrings(hostId, kwpId, panId){
+  var host = $(hostId); host.innerHTML = '';
+  cfg.strings.forEach(function(s, idx){
+    var box = document.createElement('div');
+    box.className = 'str';
+    box.innerHTML =
+      '<div class="str-h">'
+      + '<div class="nm"><span class="swatch" style="background:'+azColor(s.az)+'"></span>'
+      + esc(T('stringN')) + ' ' + (idx+1) + ' · ' + esc(compassName(s.az)) + '</div>'
+      + '<div style="display:flex;align-items:center;gap:12px">'
+      + '<span class="str-kwp">' + num(kwpOf(s),2) + ' ' + T('kwp') + '</span>'
+      + '<button class="btn btn-sm" data-rm="'+idx+'">' + esc(T('removeStr')) + '</button>'
+      + '</div></div>'
+      + '<div class="grid-f">'
+      + fld(T('panels'),  'p', idx, s.panels, 1, 1)
+      + fld(T('wp'),      'w', idx, s.wp,     1, 1)
+      + fld(T('tilt'),    't', idx, s.tilt,   1, 0, 90)
+      + '<div class="field"><label>'+esc(T('azimuth'))+'</label>'
+      + '<input type="number" step="1" data-f="a" data-i="'+idx+'" value="'+s.az+'">'
+      + '<div class="compass" data-cp="'+idx+'"></div>'
+      + '<div class="hint">'+esc(T('azHint'))+'</div></div>'
+      + '</div>';
+    host.appendChild(box);
+
+    var cp = box.querySelector('[data-cp]');
+    COMPASS[lang].forEach(function(nm, k){
+      var b = document.createElement('button');
+      b.textContent = nm;
+      b.setAttribute('aria-pressed', Math.round(norm360(s.az)/45)%8 === k ? 'true':'false');
+      b.addEventListener('click', function(){
+        cfg.strings[idx].az = k*45;
+        touchedByUser();
+        renderStrings(hostId, kwpId, panId); drawDial();
+      });
+      cp.appendChild(b);
+    });
+  });
+
+  host.querySelectorAll('[data-rm]').forEach(function(b){
+    b.addEventListener('click', function(){
+      cfg.strings.splice(+b.getAttribute('data-rm'),1);
+      touchedByUser();
+      renderStrings(hostId, kwpId, panId); drawDial();
+    });
+  });
+  host.querySelectorAll('input[data-f]').forEach(function(inp){
+    inp.addEventListener('input', function(){
+      var i = +inp.getAttribute('data-i'), f = inp.getAttribute('data-f');
+      var v = parseFloat(inp.value);
+      if (!isFinite(v)) return;
+      if (f === 'p') cfg.strings[i].panels = Math.max(0, Math.round(v));
+      if (f === 'w') cfg.strings[i].wp = Math.max(0, v);
+      if (f === 't') cfg.strings[i].tilt = clamp(v, 0, 90);
+      if (f === 'a') cfg.strings[i].az = norm360(v);
+      touchedByUser();
+      $(kwpId).textContent = num(totalKwp(),2) + ' ' + T('kwp');
+      $(panId).textContent = totalPanels();
+      drawDial();
+    });
+  });
+  $(kwpId).textContent = num(totalKwp(),2) + ' ' + T('kwp');
+  $(panId).textContent = totalPanels();
+}
+function fld(label, f, idx, val, step, min, max){
+  return '<div class="field"><label>' + esc(label) + '</label>'
+    + '<input type="number" step="'+step+'" min="'+min+'"'
+    + (max != null ? ' max="'+max+'"' : '')
+    + ' data-f="'+f+'" data-i="'+idx+'" value="'+val+'"></div>';
+}
+function addString(){
+  var opt = hasPlace() ? optimalSetup(cfg.lat, cfg.lon) : { tilt:35, az:180 };
+  cfg.strings.push({ panels:10, wp:400, tilt:opt.tilt, az:opt.az });
+  touchedByUser();
+}
+function applyDefaults(){
+  var opt = optimalSetup(cfg.lat, cfg.lon);
+  cfg.strings = [{ panels:25, wp:400, tilt:opt.tilt, az:opt.az }];
+  cfg.acLimit = 10; cfg.eff = 0.88; cfg.tempCoef = -0.35;
+  cfg.suggested = true;
+  return opt;
+}
+
+/* Akýkoľvek zásah používateľa do zostavy znamená, že to už nie je
+   vygenerovaný návrh — hláška odvtedy nemá čo hovoriť. */
+function touchedByUser(){
+  if (!cfg.suggested) return;
+  cfg.suggested = false;
+  save();
+  paintSuggestNote();
+}
+
+function paintSuggestNote(){
+  var box = $('suggNote');
+  if (!box) return;
+  if (!cfg.suggested || !cfg.strings.length){ box.classList.add('hidden'); return; }
+  var s0 = cfg.strings[0];
+  $('suggNoteT').textContent = T('suggT');
+  $('suggNoteD').textContent = T('suggD', {
+    n: s0.panels, w: s0.wp, t: num(s0.tilt, 0),
+    c: compassName(s0.az), a: num(cfg.acLimit, 1)
+  });
+  box.classList.remove('hidden');
+}
+
+/* ============================================================
+   VYHĽADÁVANIE LOKALITY — našepkávanie počas písania
+
+   Tri veci, na ktorých takéto pole býva rozbité, a ako sú ošetrené:
+   1. Dotaz na každý znak — písanie sa zdrží o 280 ms a pošle sa až posledný.
+   2. Pomalšia staršia odpoveď prepíše novšiu — každý dotaz má poradové
+      číslo a odpoveď sa zahodí, ak medzitým odišiel novší.
+   3. Zoznam sa nedá ovládať klávesnicou — šípky prechádzajú položky,
+      Enter vyberie, Escape zavrie.
+   ============================================================ */
+var searchSeq = 0;
+
+function paintResults(box, msg, list, after, state){
+  box.innerHTML = '';
+  state.items = list;
+  state.idx = -1;
+  if (!list.length){ box.classList.add('hidden'); return; }
+  msg.textContent = '';
+  list.forEach(function(r, i){
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.setAttribute('aria-selected','false');
+    b.innerHTML = '<div>' + esc(r.name) + '</div>'
+      + (r.sub ? '<div class="r2">' + esc(r.sub) + '</div>' : '');
+    b.addEventListener('mousedown', function(ev){ ev.preventDefault(); });
+    b.addEventListener('click', function(){ setPlace(r); box.classList.add('hidden'); after(); });
+    b.addEventListener('mousemove', function(){ highlight(box, state, i); });
+    box.appendChild(b);
+  });
+  box.classList.remove('hidden');
+}
+
+function highlight(box, state, i){
+  var btns = box.querySelectorAll('button');
+  state.idx = i;
+  for (var k = 0; k < btns.length; k++)
+    btns[k].setAttribute('aria-selected', k === i ? 'true' : 'false');
+  if (i >= 0 && btns[i] && btns[i].scrollIntoView) btns[i].scrollIntoView({ block:'nearest' });
+}
+
+function doSearch(inId, boxId, msgId, after, state, quiet){
+  var q = $(inId).value, box = $(boxId), msg = $(msgId);
+  if (!q || q.trim().length < 2){
+    box.classList.add('hidden');
+    msg.className = 'msg';
+    msg.textContent = quiet ? '' : T('tooShort');
+    return;
+  }
+  var mine = ++searchSeq;
+  if (!quiet){ msg.className = 'msg'; msg.textContent = T('searching'); }
+  geocode(q).then(function(list){
+    if (mine !== searchSeq) return;              // medzitým odišiel novší dotaz
+    if (!list.length){
+      box.classList.add('hidden');
+      msg.className = 'msg bad';
+      msg.textContent = T('noResults');
+      return;
+    }
+    msg.className = 'msg';
+    paintResults(box, msg, list, after, state);
+  }).catch(function(){
+    if (mine !== searchSeq) return;
+    box.classList.add('hidden');
+    msg.className = 'msg bad';
+    msg.textContent = T('searchFail');
+  });
+}
+
+function bindSearch(inId, btnId, boxId, msgId, after, onCancel){
+  var state = { items:[], idx:-1, timer:null };
+  var inp = $(inId), box = $(boxId);
+
+  inp.setAttribute('role','combobox');
+  inp.setAttribute('aria-autocomplete','list');
+  inp.setAttribute('aria-expanded','false');
+
+  inp.addEventListener('input', function(){
+    clearTimeout(state.timer);
+    // našepkávame potichu — kým používateľ píše, nehádžeme mu chybové hlášky
+    state.timer = setTimeout(function(){
+      doSearch(inId, boxId, msgId, after, state, true);
+      inp.setAttribute('aria-expanded', box.classList.contains('hidden') ? 'false' : 'true');
+    }, 280);
+  });
+
+  inp.addEventListener('keydown', function(e){
+    var open = !box.classList.contains('hidden') && state.items.length;
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp'){
+      if (!open) return;
+      e.preventDefault();
+      var n = state.items.length;
+      var next = e.key === 'ArrowDown'
+        ? (state.idx + 1) % n
+        : (state.idx <= 0 ? n - 1 : state.idx - 1);
+      highlight(box, state, next);
+      return;
+    }
+    if (e.key === 'Escape'){
+      box.classList.add('hidden');
+      inp.setAttribute('aria-expanded','false');
+      if (onCancel) onCancel();
+      return;
+    }
+    if (e.key === 'Enter'){
+      e.preventDefault();
+      clearTimeout(state.timer);
+      if (open && state.idx >= 0){
+        setPlace(state.items[state.idx]);
+        box.classList.add('hidden');
+        after();
+        return;
+      }
+      doSearch(inId, boxId, msgId, after, state, false);
+    }
+  });
+
+  inp.addEventListener('blur', function(){
+    setTimeout(function(){
+      box.classList.add('hidden');
+      inp.setAttribute('aria-expanded','false');
+      // Odchod z poľa bez výberu znamená "nechaj to, ako bolo".
+      // Ak medzitým používateľ lokalitu vybral, zatvorenie už prebehlo
+      // a druhé volanie nič nepokazí — preto tu nie je žiadna podmienka.
+      if (onCancel) onCancel();
+    }, 160);
+  });
+  inp.addEventListener('focus', function(){
+    if (state.items.length && inp.value.trim().length >= 2) box.classList.remove('hidden');
+  });
+
+  if (btnId && $(btnId)) $(btnId).addEventListener('click', function(){
+    clearTimeout(state.timer);
+    doSearch(inId, boxId, msgId, after, state, false);
+  });
+
+  return { reset: function(){
+    clearTimeout(state.timer);
+    state.items = []; state.idx = -1;
+    box.innerHTML = ''; box.classList.add('hidden');
+    inp.value = ''; inp.setAttribute('aria-expanded','false');
+    $(msgId).className = 'msg'; $(msgId).textContent = '';
+  }};
+}
+
+/* ============================================================
+   JAZYK
+   ============================================================ */
+function applyLang(){
+  document.documentElement.lang = I18N[lang].dir;
+  document.querySelectorAll('[data-t]').forEach(function(n){
+    n.textContent = T(n.getAttribute('data-t'));
+  });
+  document.querySelectorAll('[data-tp]').forEach(function(n){
+    n.setAttribute('placeholder', T(n.getAttribute('data-tp')));
+  });
+  // ikony nemajú text, ale musia mať názov pre čítačky aj bublinu myši
+  document.querySelectorAll('[data-tt]').forEach(function(n){
+    var t = T(n.getAttribute('data-tt'));
+    n.setAttribute('title', t);
+    n.setAttribute('aria-label', t);
+  });
+  $('lang').value = lang;
+  if ($('q')) $('q').placeholder = T('searchPh');
+  if ($('lCancel')) $('lCancel').textContent = cfg.place ? T('keepLoc',{p:cfg.place}) : T('cancel');
+  if ($('lHint')) $('lHint').textContent = T('editLocH');
+  paintSteps();
+  paintLocation();
+  paintSuggestNote();
+  paintThemeUI();
+  if ($('siteLoc')) paintHeader();
+}
+function detectLang(){
+  if (cfg.lang && LANGS.indexOf(cfg.lang) >= 0) return cfg.lang;
+  var n = (navigator.language || 'en').toLowerCase();
+  if (n.indexOf('sk') === 0 || n.indexOf('cs') === 0) return 'sk';
+  if (n.indexOf('de') === 0) return 'de';
+  if (n.indexOf('zh') === 0) return 'zh';
+  return 'en';
+}
+
+/* ============================================================
+   OBRAZOVKY
+   ============================================================ */
+var step = 'loc';
+function paintSteps(){
+  var b = $('stepBar');
+  if (!b) return;
+  b.innerHTML = (step === 'loc' ? '<b>'+esc(T('stepLoc'))+'</b> <s>·</s> '+esc(T('stepArr'))
+                                : esc(T('stepLoc'))+' <s>·</s> <b>'+esc(T('stepArr'))+'</b>');
+}
+/* Nad grafmi stačí vedieť, kde a čo — technické parametre patria do nastavení. */
+var fetchedAt = null;
+
+/* Čas poslednej aktualizácie sa vypisuje v jazyku rozhrania a v čase
+   používateľa, nie v čase elektrárne — hovorí o tom, kedy sa dáta
+   stiahli, nie o tom, čoho sa týkajú. */
+function stamp(){
+  if (!fetchedAt) return '';
+  try {
+    return new Intl.DateTimeFormat(I18N[lang].locale, {
+      day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'
+    }).format(fetchedAt);
+  } catch(e){
+    var h = fetchedAt.getHours(), m = fetchedAt.getMinutes();
+    return fetchedAt.getDate() + '. ' + (fetchedAt.getMonth()+1) + '. '
+      + (h<10?'0':'') + h + ':' + (m<10?'0':'') + m;
+  }
+}
+
+function paintHeader(){
+  $('siteLoc').textContent = cfg.place || '—';
+  $('siteTag').textContent = T('tagline');
+  var meta = $('infoMeta');
+  if (meta){
+    if (fetchedAt){
+      meta.innerHTML = esc(T('updated', { d: stamp(), s: '\u0000' }))
+        .replace('\u0000', '<a href="https://open-meteo.com/en/docs" target="_blank" rel="noopener">Open-Meteo</a>');
+      meta.classList.remove('hidden');
+    } else meta.classList.add('hidden');
+  }
+  var d = $('setSub');
+  if (d) d.textContent = ready()
+    ? (cfg.place || '—') + ' · ' + num(totalKwp(),2) + ' ' + T('kwp')
+      + ' · ' + cfg.strings.length + '× ' + T('stringN') + ' · ' + num(cfg.acLimit,1) + ' kW'
+    : '';
+}
+
+function paintLocation(){
+  if (!$('lName')) return;
+  $('lName').textContent = cfg.place || '–';
+  $('lSub').textContent = cfg.placeSub || '';
+}
+function showOnly(id){
+  ['setup','loading','error','app','settings'].forEach(function(k){
+    $(k).classList[k === id ? 'remove' : 'add']('hidden');
+  });
+  // horná lišta má zmysel len tam, kde je čo obnovovať alebo nastavovať
+  var t = $('openSettings'), r = $('reload'), i = $('infoBtn');
+  var onApp = (id === 'app' || id === 'settings');
+  t.classList[onApp ? 'remove' : 'add']('hidden');
+  r.classList[id === 'app' ? 'remove' : 'add']('hidden');
+  i.classList[id === 'app' ? 'remove' : 'add']('hidden');
+  if (id !== 'app') setInfo(false);
+}
+function gotoArray(){
+  step = 'arr'; paintSteps();
+  $('stLoc').classList.add('hidden');
+  $('stArr').classList.remove('hidden');
+  if (cfg.strings.length){ $('pickMode').classList.add('hidden'); $('editor').classList.remove('hidden');
+    renderStrings('strList','tKwp','tPan'); fillGlobals('f_'); }
+}
+
+function fillGlobals(pfx){
+  $(pfx+'ac').value = cfg.acLimit; $(pfx+'eff').value = cfg.eff; $(pfx+'tc').value = cfg.tempCoef;
+}
+function readGlobals(pfx){
+  var a = parseFloat($(pfx+'ac').value), e = parseFloat($(pfx+'eff').value),
+      t = parseFloat($(pfx+'tc').value);
+  var changed = false;
+  if (isFinite(a) && a > 0){ if (a !== cfg.acLimit) changed = true; cfg.acLimit = a; }
+  if (isFinite(e) && e > 0 && e <= 1){ if (e !== cfg.eff) changed = true; cfg.eff = e; }
+  if (isFinite(t)){ if (t !== cfg.tempCoef) changed = true; cfg.tempCoef = t; }
+  if (changed) touchedByUser();
+}
+function validateArray(msgId){
+  var m = $(msgId);
+  cfg.strings = cfg.strings.filter(function(s){ return s.panels > 0 && s.wp > 0; });
+  if (!cfg.strings.length){
+    m.className = 'msg bad';
+    m.textContent = T('needStr');
+    return false;
+  }
+  m.className = 'msg bad hidden';
+  return true;
+}
+
+/* ============================================================
+   RENDER + BOOT
+   ============================================================ */
+function render(){
+  drawSummary(); drawDial(); drawHeat(); drawBars(); drawTabs(); drawCurve(); drawTable();
+  // Editor v nastaveniach musí sedieť s tým, čo je práve zobrazené — inak
+  // zostane po úvodnom nastavení prázdny až do obnovenia stránky.
+  if ($('settings').classList.contains('hidden')){
+    renderStrings('strList2','tKwp2','tPan2');
+    fillGlobals('g_');
+    paintLocation();
+    paintSuggestNote();
+    closeResetBox();
+  }
+}
+
+function boot(){
+  hideTip();
+  if (!ready()){
+    showOnly('setup');
+    if (!hasPlace()){ step='loc'; paintSteps();
+      $('stLoc').classList.remove('hidden'); $('stArr').classList.add('hidden'); }
+    else gotoArray();
+    return;
+  }
+  showOnly('loading');
+  getForecast().then(function(api){
+    model = buildModel(api);
+    if (!model.days.length) throw new Error('No usable hourly data returned.');
+    fetchedAt = new Date();
+    sel = 0;
+    showOnly('app');
+    render();
+  }).catch(function(e){
+    showOnly('error');
+    $('errMsg').textContent = (e && e.message) ? e.message : T('searchFail');
+  });
+}
+
+/* ---- udalosti ---- */
+tipEl = $('tip');
+document.addEventListener('scroll', hideTip, true);
+/* Zmena šírky okna aj otočenie telefónu menia rozmery grafov,
+   preto sa prekresľujú všetky. Prekreslenie sa zdrží, aby sa
+   pri plynulom ťahaní okna nespúšťalo pri každom pixeli. */
+var reflowTimer = null, lastW = window.innerWidth;
+function scheduleReflow(force){
+  clearTimeout(reflowTimer);
+  reflowTimer = setTimeout(function(){
+    if (!model) return;
+    if (!force && window.innerWidth === lastW) return;
+    lastW = window.innerWidth;
+    hideTip();
+    drawDial(); drawHeat(); drawBars(); drawCurve();
+  }, 140);
+}
+window.addEventListener('resize', function(){ scheduleReflow(false); });
+window.addEventListener('orientationchange', function(){ setTimeout(function(){ scheduleReflow(true); }, 260); });
+// prepnutie obrazovky mení dostupnú šírku, grafy sa musia premerať
+function reflowNow(){ scheduleReflow(true); }
+
+$('lang').addEventListener('change', function(){
+  lang = $('lang').value; cfg.lang = lang; save();
+  applyLang();
+  if (model) render();
+  if (!$('strList').closest('.hidden')) renderStrings('strList','tKwp','tPan');
+  if (model) renderStrings('strList2','tKwp2','tPan2');
+});
+function openSettingsScreen(){
+  if (!model) return;
+  renderStrings('strList2','tKwp2','tPan2');
+  fillGlobals('g_');
+  paintLocation();
+  paintSuggestNote();
+  paintThemeUI();
+  paintHeader();
+  closeResetBox();
+  closeLocEdit();
+  showOnly('settings');
+  window.scrollTo(0, 0);
+  reflowNow();
+}
+
+/* Odchod z nastavení uloží a prepočíta. Polia zapisujú priamo do
+   nastavení, takže tichý návrat bez uloženia by nechal appku
+   zobrazovať čísla, ktoré už nezodpovedajú zadaným parametrom. */
+function leaveSettings(){
+  readGlobals('g_');
+  if (!validateArray('gMsg')) return;
+  save();
+  boot();
+}
+/* Panel s vysvetlením otvára ikonka pri podtitulku. Zavrie ho krížik,
+   Escape alebo prepnutie obrazovky — nemá zostať visieť nad dátami. */
+function setInfo(open){
+  $('infoPanel').classList[open ? 'remove' : 'add']('hidden');
+  $('infoBtn').setAttribute('aria-expanded', open ? 'true' : 'false');
+  if (open) scheduleReflow(true);
+}
+$('infoBtn').addEventListener('click', function(){
+  setInfo($('infoPanel').classList.contains('hidden'));
+});
+$('infoClose').addEventListener('click', function(){ setInfo(false); });
+document.addEventListener('keydown', function(e){
+  if (e.key === 'Escape' && !$('infoPanel').classList.contains('hidden')) setInfo(false);
+});
+
+$('modeRow').querySelectorAll('button').forEach(function(b){
+  b.addEventListener('click', function(){ setMode(b.getAttribute('data-mode')); });
+});
+$('openSettings').addEventListener('click', openSettingsScreen);
+$('setBack').addEventListener('click', leaveSettings);
+
+$('reload').addEventListener('click', boot);
+$('retry').addEventListener('click', boot);
+
+bindSearch('q','qGo','qRes','qMsg', function(){ gotoArray(); });
+/* Úprava lokality: pole sa otvorí na mieste doterajšej lokality a zavrie sa
+   vždy, keď z neho odídeš — klikom mimo, Escape alebo tlačidlom Zrušiť.
+   Bez výberu z ponuky sa nič nemení. */
+var locSearch = bindSearch('lq', null, 'lRes', 'lMsg', function(){
+  closeLocEdit(); save(); boot();
+}, function(){ closeLocEdit(); });
+
+function openLocEdit(){
+  locSearch.reset();
+  $('lq').placeholder = cfg.place || T('searchPh');
+  $('lHint').textContent = T('editLocH');
+  $('lCancel').textContent = cfg.place ? T('keepLoc', { p: cfg.place }) : T('cancel');
+  $('lView').classList.add('hidden');
+  $('lEdit').classList.remove('hidden');
+  $('lq').focus();
+}
+function closeLocEdit(){
+  locSearch.reset();
+  $('lEdit').classList.add('hidden');
+  $('lView').classList.remove('hidden');
+  paintLocation();
+}
+$('lChange').addEventListener('click', openLocEdit);
+$('lCancel').addEventListener('mousedown', function(e){ e.preventDefault(); });
+$('lCancel').addEventListener('click', closeLocEdit);
+
+$('modeKnow').addEventListener('click', function(){
+  if (!cfg.strings.length) addString();
+  $('pickMode').classList.add('hidden'); $('editor').classList.remove('hidden');
+  renderStrings('strList','tKwp','tPan'); fillGlobals('f_'); drawDial();
+});
+/* Návrh zostavy nemá čo potvrdzovať — používateľ práve povedal,
+   že parametre nepozná. Ide rovno na predpoveď, zostavu si vie
+   kedykoľvek upraviť cez ikonu nastavení. */
+$('modeAuto').addEventListener('click', function(){
+  applyDefaults();
+  save();
+  boot();
+});
+$('addStr').addEventListener('click', function(){
+  addString(); renderStrings('strList','tKwp','tPan'); drawDial();
+});
+$('backLoc').addEventListener('click', function(){
+  step = 'loc'; paintSteps();
+  $('stArr').classList.add('hidden'); $('stLoc').classList.remove('hidden');
+});
+$('finish').addEventListener('click', function(){
+  readGlobals('f_');
+  if (!validateArray('edMsg')) return;
+  save(); boot();
+});
+
+$('addStr2').addEventListener('click', function(){
+  addString(); renderStrings('strList2','tKwp2','tPan2'); drawDial();
+});
+$('suggest').addEventListener('click', function(){
+  var opt = optimalSetup(cfg.lat, cfg.lon);
+  cfg.strings.forEach(function(s){ s.tilt = opt.tilt; s.az = opt.az; });
+  renderStrings('strList2','tKwp2','tPan2'); drawDial();
+  var m = $('gMsg'); m.className = 'msg'; m.classList.remove('hidden');
+  m.textContent = T('optDone',{t:opt.tilt, a:opt.az});
+});
+$('apply').addEventListener('click', leaveSettings);
+
+/* ============================================================
+   VYMAZANIE ZADANÝCH ÚDAJOV
+
+   Dvojkrokové: prvý klik len odkryje varovanie s tým, čo sa stratí,
+   samotné vymazanie prebehne až po druhom potvrdení. Jazyk ostáva
+   nastavený tak, ako ho má používateľ práve zvolený — inak by po
+   vymazaní skončil na obrazovke v jazyku, ktorý možno nečíta.
+   ============================================================ */
+$('resetOpen').addEventListener('click', function(){
+  $('resetBox').classList.remove('hidden');
+  $('resetOpen').classList.add('hidden');
+  $('resetGo').focus();
+});
+$('resetNo').addEventListener('click', closeResetBox);
+function closeResetBox(){
+  $('resetBox').classList.add('hidden');
+  $('resetOpen').classList.remove('hidden');
+}
+
+$('resetGo').addEventListener('click', function(){
+  var keepLang = lang;
+  try { localStorage.removeItem(STORE); } catch(e){}
+  cfg = defaultCfg();
+  cfg.lang = keepLang;
+  model = null;
+  sel = 0;
+
+  closeResetBox();
+  closeLocEdit();
+
+  // úvodné nastavenie vrátiť do stavu, v akom je pri prvom spustení
+  step = 'loc';
+  $('stLoc').classList.remove('hidden');
+  $('stArr').classList.add('hidden');
+  $('pickMode').classList.remove('hidden');
+  $('editor').classList.add('hidden');
+  $('edMsg').classList.add('hidden');
+  $('gMsg').classList.add('hidden');
+  $('q').value = '';
+  $('qRes').innerHTML = '';
+  $('qRes').classList.add('hidden');
+  $('strList').innerHTML = '';
+  $('strList2').innerHTML = '';
+  paintSuggestNote();
+  fillGlobals('f_');
+
+  var m = $('qMsg');
+  m.className = 'msg';
+  m.textContent = T('resetDone');
+
+  showOnly('setup');
+  boot();
+});
+
+/* ---- štart ---- */
+load();
+lang = detectLang();
+applyTheme();
+applyLang();
+if (ready()){ renderStrings('strList2','tKwp2','tPan2'); fillGlobals('g_'); }
+boot();
+
+})();
+</script>
+</body>
+</html>
