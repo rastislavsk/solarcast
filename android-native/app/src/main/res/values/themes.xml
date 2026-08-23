@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Compose paints everything; this exists so the window has the right
+         colour before the first frame and no action bar is inflated. -->
+    <style name="Theme.SolarCast" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="android:windowBackground">@color/brand_background</item>
+    </style>
+
+    <style name="Theme.SolarCast.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/brand_background</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash_logo</item>
+        <item name="postSplashScreenTheme">@style/Theme.SolarCast</item>
+    </style>
+</resources>

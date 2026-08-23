@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+        The page's default background (terracotta scheme, dark). Only the window
+        and the splash use it; from the first frame Compose paints the palette
+        the user actually chose.
+    -->
+    <color name="brand_background">#131010</color>
+</resources>

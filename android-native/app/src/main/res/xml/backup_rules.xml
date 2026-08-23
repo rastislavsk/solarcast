@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Android 11 and below. Naming an <include> makes everything else implicitly
+    excluded, so caches stay out without listing them: the only thing worth
+    carrying to a new device is the saved system.
+-->
+<full-backup-content>
+    <include domain="file" path="datastore" />
+</full-backup-content>

@@ -10,12 +10,13 @@ onto your actual panel planes.
 | Path | What it is |
 | --- | --- |
 | `index.html` | The whole web app. One standalone file, no build step, no backend. Open it in a browser and it works. |
-| `android/` | Native Android shell that packages `index.html` as an app for Google Play. See [android/README.md](android/README.md). |
+| `android/` | Android app that packages `index.html` in a WebView. See [android/README.md](android/README.md). |
+| `android-native/` | The same app rebuilt natively in Kotlin and Jetpack Compose — no WebView, the solar model ported to Kotlin. See [android-native/README.md](android-native/README.md). |
 | `PRIVACY.md` | Privacy policy. Play requires a public URL for it. |
 
-`index.html` is the single source of truth. The Android build copies it into the
-app's assets at build time rather than keeping a second copy, so the two can
-never drift apart.
+`index.html` is the single source of truth for both Android apps. The WebView one
+copies it into its assets at build time; the native one generates its
+translations and colour schemes from it. Neither keeps a second, editable copy.
 
 ## Running the web version
 
