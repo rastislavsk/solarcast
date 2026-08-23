@@ -72,11 +72,20 @@ svg text{font-family:var(--mono);fill:var(--dim)}
   display:flex;align-items:center;justify-content:center}
 .info-close:hover{color:var(--text);border-color:var(--dim-2)}
 .tools{display:flex;align-items:center;gap:9px}
-select.lang{background:var(--surface);border:1px solid var(--line);border-radius:9px;
-  color:var(--dim);padding:0 8px;height:40px;font-family:var(--mono);font-size:12px;
+/* výber jazyka — glóbus pred kódom jazyka, aby bolo aj bez textu vidieť,
+   čo sa tu prepína; rámik nesie obal, select je vnútri priehľadný */
+.langpick{display:inline-flex;align-items:center;gap:5px;height:40px;padding:0 6px 0 9px;
+  border:1px solid var(--line);border-radius:9px;background:var(--surface);
+  color:var(--dim);flex:none;transition:color .15s,border-color .15s}
+.langpick:hover{color:var(--text);border-color:#443C5E}
+.langpick:focus-within{border-color:var(--cool)}
+.langpick .globe{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;
+  stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;display:block}
+select.lang{background:transparent;border:0;border-radius:7px;
+  color:inherit;padding:0 2px;height:38px;font-family:var(--mono);font-size:12px;
   letter-spacing:.06em;text-align:center;text-align-last:center;cursor:pointer}
-select.lang:focus{outline:none;border-color:var(--cool)}
-select.lang:hover{color:var(--text);border-color:#443C5E}
+select.lang:focus{outline:none}
+select.lang option{background:var(--surface);color:var(--text)}
 
 /* ikonové tlačidlá — štvorcový dotykový cieľ, kresba ťahom */
 /* dvojitá trieda zámerne: inak mobilné pravidlo .btn prebije nulové odsadenie */
@@ -288,7 +297,9 @@ html[data-mode="light"] .tip b{color:#fff}
   .info-meta{font-size:11px}
   .top{align-items:center}
   .tools{width:auto;gap:7px}
-  .tools select.lang{width:62px;padding:0 4px}
+  .langpick{height:38px;padding:0 4px 0 7px;gap:3px}
+  .langpick .globe{width:16px;height:16px}
+  .tools select.lang{width:46px;height:36px;padding:0}
   .btn-icon{width:38px;height:38px}
   .btn-icon svg{width:21px;height:21px}
   .scr-head{padding-bottom:14px;gap:11px}
@@ -379,12 +390,19 @@ html[data-mode="light"] .tip b{color:#fff}
       </div>
     </div>
     <div class="tools">
-      <select class="lang" id="lang" aria-label="Language">
-        <option value="sk">SK</option>
-        <option value="en">EN</option>
-        <option value="de">DE</option>
-        <option value="zh">中文</option>
-      </select>
+      <div class="langpick" id="langPick">
+        <svg class="globe" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="9.2"/>
+          <path d="M3.1 9.1h17.8M3.1 14.9h17.8"/>
+          <path d="M12 2.8c2.5 2.7 3.8 5.8 3.8 9.2S14.5 18.5 12 21.2C9.5 18.5 8.2 15.4 8.2 12S9.5 5.5 12 2.8Z"/>
+        </svg>
+        <select class="lang" id="lang" data-tt="langSel" aria-label="Language">
+          <option value="sk">SK</option>
+          <option value="en">EN</option>
+          <option value="de">DE</option>
+          <option value="zh">中文</option>
+        </select>
+      </div>
       <button class="btn btn-icon" id="openSettings" data-tt="yourArray">
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="M2.2 5.6h4.4M12.4 5.6h9.4M2.2 12h11.2M19.2 12h2.6M2.2 18.4h2.6M10.6 18.4h11.2"/>
@@ -680,6 +698,7 @@ sk:{
  updated:'Aktualizované {d} · zdroj {s}',
  aboutData:'O týchto číslach',
  refresh:'Obnoviť', search:'Hľadať', back:'Späť', change:'Zmeniť', retry:'Skúsiť znova',
+ langSel:'Jazyk aplikácie',
  searchPh:'Mesto alebo obec, napr. Nitra',
  stepLoc:'1 · Lokalita', stepArr:'2 · Zostava panelov',
  setupLocT:'Kde sa nachádza tvoja elektráreň?',
@@ -741,6 +760,7 @@ en:{
  updated:'Updated {d} · source {s}',
  aboutData:'About these numbers',
  refresh:'Refresh', search:'Search', back:'Back', change:'Change', retry:'Try again',
+ langSel:'App language',
  searchPh:'City or town, e.g. Nitra',
  stepLoc:'1 · Location', stepArr:'2 · Array',
  setupLocT:'Where is your system?',
@@ -802,6 +822,7 @@ de:{
  updated:'Aktualisiert {d} · Quelle {s}',
  aboutData:'Über diese Zahlen',
  refresh:'Aktualisieren', search:'Suchen', back:'Zurück', change:'Ändern', retry:'Erneut versuchen',
+ langSel:'Sprache der App',
  searchPh:'Stadt oder Gemeinde, z. B. Nitra',
  stepLoc:'1 · Standort', stepArr:'2 · Anlage',
  setupLocT:'Wo steht deine Anlage?',
@@ -863,6 +884,7 @@ zh:{
  updated:'更新于 {d} · 数据源 {s}',
  aboutData:'关于这些数字',
  refresh:'刷新', search:'搜索', back:'返回', change:'更改', retry:'重试',
+ langSel:'应用语言',
  searchPh:'城市或乡镇，例如 Nitra',
  stepLoc:'1 · 位置', stepArr:'2 · 组件阵列',
  setupLocT:'你的光伏系统在哪里？',
@@ -2230,6 +2252,8 @@ function applyLang(){
     n.setAttribute('aria-label', t);
   });
   $('lang').value = lang;
+  // bublina patrí aj na obal, inak sa nad glóbusom nič neukáže
+  if ($('langPick')) $('langPick').setAttribute('title', T('langSel'));
   if ($('q')) $('q').placeholder = T('searchPh');
   if ($('lCancel')) $('lCancel').textContent = cfg.place ? T('keepLoc',{p:cfg.place}) : T('cancel');
   if ($('lHint')) $('lHint').textContent = T('editLocH');
