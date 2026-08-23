@@ -1,5 +1,5 @@
 # SolarCast
-[HTML + WebView shell + Android Native app - RR & Claude Code]
+[HTML + WebView shell + Android Native apps - test RR & Claude Code]
 
 A seven-day photovoltaic output forecast for any location. Tell it where your
 system is and how it is built, and it projects Open-Meteo's radiation forecast
