@@ -1,0 +1,11 @@
+# Store text as LF. Without this the Windows checkout writes CRLF into gradlew,
+# which then fails to run on Linux CI and in WSL.
+* text=auto eol=lf
+
+gradlew    text eol=lf
+*.bat      text eol=crlf
+
+*.jar      binary
+*.png      binary
+*.jks      binary
+*.keystore binary

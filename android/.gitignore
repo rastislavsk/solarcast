@@ -1,0 +1,14 @@
+*.iml
+.gradle/
+local.properties
+.idea/
+.DS_Store
+build/
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Signing material never belongs in the repository.
+keystore.properties
+*.jks
+*.keystore

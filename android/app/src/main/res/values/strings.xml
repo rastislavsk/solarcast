@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Brand name: the same in every language. -->
+    <string name="app_name" translatable="false">SolarCast</string>
+
+    <!--
+        Not shown by the shell, which draws no text of its own. It exists so the
+        values-sk / values-de / values-zh folders carry a real string: that is
+        what generateLocaleConfig reads to declare the app's supported locales,
+        and it is what puts SolarCast under Settings > Languages. It also keeps
+        the store listing's short description under version control next to the
+        code it describes.
+    -->
+    <string name="app_short_description" tools:ignore="UnusedResources">Seven-day photovoltaic output forecast</string>
+
+</resources>
