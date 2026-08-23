@@ -3,9 +3,9 @@ name: Android
 on:
   push:
     branches: [main]
-    paths: ['android/**', 'index.html', '.github/workflows/android.yml']
+    paths: ['android-native/**', 'index.html', '.github/workflows/android.yml']
   pull_request:
-    paths: ['android/**', 'index.html', '.github/workflows/android.yml']
+    paths: ['android-native/**', 'index.html', '.github/workflows/android.yml']
   workflow_dispatch:
 
 permissions:
@@ -24,26 +24,33 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v4
 
+      # The page's translations and colour schemes are generated into this
+      # module from index.html; regenerate before building so CI catches a
+      # divergence instead of building against a stale committed copy.
+      - name: Generate resources from index.html
+        working-directory: android-native
+        run: node tools/generate-from-web.mjs
+
       # No keystore.properties here, so this produces an unsigned bundle. Its
-      # job is to prove the build, the Kotlin compile and lintVital all pass —
+      # job is to prove the build, the Kotlin compile and lintRelease all pass —
       # the artefact that goes to Play is signed locally with the upload key.
       - name: Build release bundle
-        working-directory: android
+        working-directory: android-native
         run: ./gradlew :app:bundleRelease --no-daemon
 
       - name: Run lint
-        working-directory: android
+        working-directory: android-native
         run: ./gradlew :app:lintRelease --no-daemon
 
       - uses: actions/upload-artifact@v4
         with:
           name: solarcast-aab-unsigned
-          path: android/app/build/outputs/bundle/release/*.aab
+          path: android-native/app/build/outputs/bundle/release/*.aab
           if-no-files-found: error
 
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: lint-report
-          path: android/app/build/reports/lint-results-release.html
+          path: android-native/app/build/reports/lint-results-release.html
           if-no-files-found: ignore

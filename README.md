@@ -1,5 +1,5 @@
 # SolarCast
-[HTML + WebView shell + Android Native apps - test RR & Claude Code]
+[HTML + Android Native app - test RR & Claude Code]
 
 A seven-day photovoltaic output forecast for any location. Tell it where your
 system is and how it is built, and it projects Open-Meteo's radiation forecast
@@ -10,13 +10,12 @@ onto your actual panel planes.
 | Path | What it is |
 | --- | --- |
 | `index.html` | The whole web app. One standalone file, no build step, no backend. Open it in a browser and it works. |
-| `android/` | Android app that packages `index.html` in a WebView. See [android/README.md](android/README.md). |
-| `android-native/` | The same app rebuilt natively in Kotlin and Jetpack Compose — no WebView, the solar model ported to Kotlin. See [android-native/README.md](android-native/README.md). |
+| `android-native/` | Native Android app: Kotlin and Jetpack Compose, no WebView, the solar model ported to Kotlin. See [android-native/README.md](android-native/README.md). |
 | `PRIVACY.md` | Privacy policy. Play requires a public URL for it. |
 
-`index.html` is the single source of truth for both Android apps. The WebView one
-copies it into its assets at build time; the native one generates its
-translations and colour schemes from it. Neither keeps a second, editable copy.
+`index.html` is the single source of truth for the Android app: a generator
+lifts its translations and colour schemes into Android resources and Kotlin
+rather than keeping a second, editable copy.
 
 ## Running the web version
 
