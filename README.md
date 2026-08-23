@@ -1,4 +1,5 @@
 # SolarCast
+[by Claude Code]
 
 A seven-day photovoltaic output forecast for any location. Tell it where your
 system is and how it is built, and it projects Open-Meteo's radiation forecast
