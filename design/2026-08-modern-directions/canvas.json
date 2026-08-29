@@ -1,11 +1,11 @@
 {
   "artboards": [
-    { "file": "Main.dc.html", "x": 0, "y": 0, "w": 1440, "h": 1180, "title": "Smer A — Prístrojová doska" },
-    { "file": "DirectionB.dc.html", "x": 1560, "y": 0, "w": 1440, "h": 1180, "title": "Smer B — Denné svetlo" }
+    { "file": "Main.dc.html", "x": 0, "y": 0, "w": 390, "h": 1380, "title": "Smer A — Prístrojová doska" },
+    { "file": "DirectionB.dc.html", "x": 470, "y": 0, "w": 390, "h": 1380, "title": "Smer B — Denné svetlo" }
   ],
   "annotations": [
-    { "id": "note-a", "x": 0, "y": -110, "w": 620, "text": "SMER A — Prístrojová doska\nTmavý, technický, dátovo hutný — rozvíja súčasnú tmavú paletu appky (zlatý akcent, mono štítky) do rafinovanejšej, presnejšej podoby s jemným leskom a kruhovým ukazovateľom." },
-    { "id": "note-b", "x": 1560, "y": -110, "w": 620, "text": "SMER B — Denné svetlo\nSvetlý, redakčný, priateľský — teplý papierový podklad, serifové nadpisy, terakotový akcent a oblúk slnečnej dráhy namiesto kompasu." }
+    { "id": "note-a", "x": 0, "y": -110, "w": 390, "text": "SMER A — Prístrojová doska (mobil)\nKompas nahradený kompaktným prstencom vedľa čísla Dnes; 7-dňová tabuľka + graf zlúčené do jedného zoznamu dní s mini stĺpcom využitia." },
+    { "id": "note-b", "x": 470, "y": -110, "w": 390, "text": "SMER B — Denné svetlo (mobil)\nOblúk slnečnej dráhy zmenšený vedľa čísla Dnes; dni ako zoznam s vodorovným pruhom využitia namiesto tabuľky." }
   ],
   "launch": { "view": "canvas" }
 }
