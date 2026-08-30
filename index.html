@@ -20,13 +20,15 @@
   --accent:#F2C14E;
   --cool:#5BC8F5;
   --warn:#F2724E;
-  --r:14px;
+  --r:18px;
+  --panel:linear-gradient(180deg, color-mix(in oklab, var(--surface-2) 55%, var(--surface)), var(--surface));
   --mono:'JetBrains Mono','Noto Sans SC',ui-monospace,monospace;
   --sans:'Archivo','Noto Sans SC',system-ui,-apple-system,sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{-webkit-text-size-adjust:100%}
-body{background:var(--bg);color:var(--text);font-family:var(--sans);
+body{background:radial-gradient(closest-side, color-mix(in oklab, var(--accent) 10%, transparent), transparent 70%) center -220px / 1100px 620px no-repeat, var(--bg);
+  color:var(--text);font-family:var(--sans);
   font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;padding:0 0 90px}
 .wrap{max-width:1160px;margin:0 auto;padding:0 24px}
 @media(max-width:640px){.wrap{padding:0 15px}}
@@ -59,7 +61,7 @@ svg text{font-family:var(--mono);fill:var(--dim)}
 .info-dot:focus-visible{outline:2px solid var(--cool);outline-offset:2px}
 
 .infobox{position:relative;border:1px solid var(--line);border-radius:var(--r);
-  background:var(--surface);padding:20px 46px 16px 20px;margin-bottom:30px}
+  background:var(--panel);padding:20px 46px 16px 20px;margin-bottom:30px}
 .infobox p{font-size:12.5px;color:var(--dim);max-width:80ch;line-height:1.65;margin-bottom:10px}
 .infobox p:last-child{margin-bottom:0}
 .infobox a{color:var(--dim);text-decoration:none;border-bottom:1px solid var(--line)}
@@ -116,14 +118,16 @@ select.lang option{background:var(--surface);color:var(--text)}
 .hero{display:grid;grid-template-columns:250px 1fr;gap:1px;background:var(--line-soft);
   border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-bottom:46px}
 @media(max-width:760px){.hero{grid-template-columns:1fr}}
-.hero-dial{background:var(--surface);padding:22px;display:flex;flex-direction:column;
+.hero-dial{background:var(--panel);padding:22px;display:flex;flex-direction:column;
   align-items:center;justify-content:center;gap:14px}
-.hero-nums{background:var(--surface);padding:26px 28px;display:grid;
+.hero-nums{background:var(--panel);padding:26px 28px;display:grid;
   grid-template-columns:repeat(3,1fr);gap:26px;align-content:center}
 @media(max-width:560px){.hero-nums{grid-template-columns:1fr;gap:20px;padding:22px}}
+.hero-nums>div:first-child{background:linear-gradient(135deg, color-mix(in oklab, var(--accent) 13%, transparent), transparent 75%);
+  border-radius:calc(var(--r) - 6px);margin:-10px -12px;padding:10px 12px}
 .lbl{font-family:var(--mono);font-size:10px;letter-spacing:.13em;text-transform:uppercase;
   color:var(--dim-2);margin-bottom:11px}
-.big{font-family:var(--mono);font-size:31px;font-weight:500;letter-spacing:-.035em;line-height:1}
+.big{font-family:var(--mono);font-size:33px;font-weight:600;letter-spacing:-.035em;line-height:1}
 .big .u{font-size:14px;color:var(--dim);margin-left:5px;letter-spacing:0}
 .note{font-size:12.5px;color:var(--dim);margin-top:9px;line-height:1.45}
 .note b{color:var(--text);font-weight:500}
@@ -138,7 +142,7 @@ section{margin-bottom:50px}
 .shead p{font-size:13px;color:var(--dim);max-width:58ch;margin-top:5px}
 .legend{display:flex;gap:15px;font-family:var(--mono);font-size:10.5px;color:var(--dim);flex-wrap:wrap;align-items:center}
 .legend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px;vertical-align:middle}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:20px}
 .scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
 .tabs{display:flex;gap:6px;flex-wrap:wrap}
 .tab{font-family:var(--mono);font-size:11px;padding:7px 12px;border:1px solid var(--line);
@@ -166,7 +170,7 @@ th+th,td+td{padding-left:17px}
 
 /* ---------- states / setup ---------- */
 .state{padding:52px 22px;text-align:center;border:1px solid var(--line);
-  border-radius:var(--r);background:var(--surface)}
+  border-radius:var(--r);background:var(--panel)}
 .state .t{font-size:17px;font-weight:600;margin-bottom:9px}
 .state .d{font-size:13.5px;color:var(--dim);max-width:50ch;margin:0 auto 22px;line-height:1.55}
 .pulse{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);
@@ -253,7 +257,7 @@ html[data-mode="light"]{color-scheme:light}
 
 /* pozostatok po pôvodnom rozbaľovacom paneli — ponechané len odsadenie,
    ktoré teraz používa obrazovka nastavení */
-details.panel{border:1px solid var(--line);border-radius:var(--r);background:var(--surface);margin-bottom:14px}
+details.panel{border:1px solid var(--line);border-radius:var(--r);background:var(--panel);margin-bottom:14px}
 details.panel summary{padding:17px 21px;cursor:pointer;display:flex;align-items:center;
   justify-content:space-between;font-family:var(--mono);font-size:11px;letter-spacing:.1em;
   text-transform:uppercase;color:var(--dim);list-style:none}
