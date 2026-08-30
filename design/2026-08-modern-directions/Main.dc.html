@@ -1,0 +1,203 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg: oklch(16% 0.025 295);
+      --surface: oklch(21% 0.03 295);
+      --surface-2: oklch(25% 0.032 295);
+      --line: oklch(38% 0.03 295 / 0.5);
+      --line-soft: oklch(32% 0.03 295 / 0.35);
+      --text: oklch(96% 0.008 295);
+      --dim: oklch(70% 0.03 295);
+      --dim-2: oklch(50% 0.03 295);
+      --accent: oklch(83% 0.15 85);
+      --accent-2: oklch(78% 0.1 220);
+      --sans: 'Archivo', system-ui, -apple-system, sans-serif;
+      --mono: 'JetBrains Mono', ui-monospace, monospace;
+    }
+    body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);
+      -webkit-font-smoothing:antialiased}
+    a{color:var(--accent-2)} a:hover{color:var(--text)}
+    .root{width:390px;position:relative;overflow:hidden;padding:28px 18px 44px}
+    .glow{position:absolute;top:-160px;left:50%;transform:translateX(-50%);
+      width:420px;height:300px;border-radius:50%;
+      background:radial-gradient(closest-side, oklch(83% 0.15 85 / 0.16), transparent 72%);
+      pointer-events:none}
+
+    .top{display:flex;align-items:center;justify-content:space-between;gap:14px;
+      padding-bottom:20px;border-bottom:1px solid var(--line);margin-bottom:22px;position:relative}
+    .mark{display:flex;align-items:center;gap:10px}
+    .mark svg{width:24px;height:24px;flex:none}
+    .mark h1{font-size:19px;font-weight:700;letter-spacing:-.02em;margin:0}
+    .btn-icon{width:44px;height:44px;border-radius:11px;border:1px solid var(--line);
+      background:var(--surface);color:var(--dim);display:flex;align-items:center;justify-content:center;flex:none}
+    .btn-icon svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.7;
+      stroke-linecap:round;stroke-linejoin:round}
+
+    .siteloc{font-size:15px;font-weight:500;color:var(--text);position:relative}
+    .sitetag{font-family:var(--mono);font-size:10.5px;color:var(--dim-2);letter-spacing:.04em;
+      margin-top:4px;margin-bottom:20px;position:relative}
+
+    .panel{background:linear-gradient(180deg, oklch(24% 0.032 295 / 0.9), oklch(21% 0.03 295 / 0.9));
+      border:1px solid var(--line);border-radius:18px;position:relative}
+    .hero{display:flex;align-items:center;gap:16px;padding:20px;margin-bottom:14px}
+    .ring-wrap{position:relative;width:104px;height:104px;flex:none;display:flex;
+      align-items:center;justify-content:center}
+    .ring-num{position:absolute;display:flex;flex-direction:column;align-items:center}
+    .ring-num b{font-family:var(--mono);font-size:18px;font-weight:600}
+    .ring-num span{font-family:var(--mono);font-size:8.5px;color:var(--dim);margin-top:1px;text-align:center;line-height:1.2}
+    .hero-txt{min-width:0}
+    .hero-txt .lbl{font-family:var(--mono);font-size:10px;letter-spacing:.13em;text-transform:uppercase;
+      color:var(--dim-2);margin-bottom:6px}
+    .hero-txt .val{font-family:var(--mono);font-size:28px;font-weight:600;letter-spacing:-.03em;
+      display:flex;align-items:baseline;gap:5px}
+    .hero-txt .val small{font-size:13px;font-weight:400;color:var(--dim)}
+    .hero-txt .delta{font-size:12px;color:var(--accent);margin-top:5px;line-height:1.4}
+
+    .arr-line{font-family:var(--mono);font-size:11px;color:var(--dim);padding:12px 20px 16px;
+      border-top:1px solid var(--line-soft);margin-top:-4px}
+    .arr-line b{color:var(--text);font-weight:500}
+
+    .stats2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:30px}
+    .stat{padding:16px 16px 15px;display:flex;flex-direction:column;gap:6px}
+    .stat .lbl{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;
+      color:var(--dim-2)}
+    .stat .val{font-family:var(--mono);font-size:20px;font-weight:600;letter-spacing:-.02em}
+    .stat .val small{font-size:11px;font-weight:400;color:var(--dim)}
+    .stat .note{font-size:10.5px;color:var(--dim-2)}
+
+    .shead{margin-bottom:16px}
+    .shead h2{font-size:16px;font-weight:600;letter-spacing:-.01em;margin:0}
+    .shead p{font-size:12px;color:var(--dim);margin:5px 0 0;line-height:1.5}
+
+    .daylist{padding:6px 20px}
+    .day-row{display:flex;align-items:center;justify-content:space-between;gap:12px;
+      padding:14px 0;border-bottom:1px solid var(--line-soft)}
+    .day-row:last-child{border-bottom:none}
+    .day-info{min-width:0}
+    .day-name{font-size:13.5px;font-weight:500}
+    .day-row.today .day-name{color:var(--text);font-weight:700}
+    .day-sub{font-family:var(--mono);font-size:10px;color:var(--dim-2);margin-top:3px}
+    .day-metric{display:flex;align-items:center;gap:10px;flex:none}
+    .mini-bar{width:5px;height:34px;border-radius:3px;background:var(--line-soft);
+      display:flex;align-items:flex-end;overflow:hidden}
+    .mini-bar-fill{width:100%;border-radius:3px;background:var(--accent)}
+    .day-row.today .mini-bar-fill{background:var(--accent)}
+    .day-val{font-family:var(--mono);font-size:15px;font-weight:600;letter-spacing:-.02em;
+      display:flex;align-items:baseline;gap:3px;min-width:66px;justify-content:flex-end}
+    .day-val span{font-size:10px;font-weight:400;color:var(--dim)}
+
+    .foot{font-size:11px;color:var(--dim-2);line-height:1.6;margin-top:26px;padding-top:18px;
+      border-top:1px solid var(--line)}
+  </style>
+</helmet>
+
+<div class="root">
+  <div class="glow"></div>
+
+  <div class="top">
+    <div class="mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
+        <circle cx="12" cy="12" r="4.2"></circle>
+        <path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"></path>
+      </svg>
+      <h1>SolarCast</h1>
+    </div>
+    <button class="btn-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"></circle>
+        <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V21a2 2 0 0 1-4 0v-.09a1.7 1.7 0 0 0-1.1-1.55 1.7 1.7 0 0 0-1.88.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.55-1H3a2 2 0 0 1 0-4h.09a1.7 1.7 0 0 0 1.55-1 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34H9a1.7 1.7 0 0 0 1-1.55V3a2 2 0 0 1 4 0v.09a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87V9a1.7 1.7 0 0 0 1.55 1H21a2 2 0 0 1 0 4h-.09a1.7 1.7 0 0 0-1.51 1z"></path>
+      </svg>
+    </button>
+  </div>
+
+  <div class="siteloc">Bratislava, SK</div>
+  <div class="sitetag">48.15° S · 17.11° V · PREDPOVEĎ NA 7 DNÍ</div>
+
+  <div class="panel">
+    <div class="hero">
+      <div class="ring-wrap">
+        <svg width="104" height="104" viewBox="0 0 104 104">
+          <circle cx="52" cy="52" r="44" fill="none" stroke="oklch(38% 0.03 295 / 0.5)" stroke-width="8"></circle>
+          <circle cx="52" cy="52" r="44" fill="none" stroke="oklch(83% 0.15 85)" stroke-width="8"
+            stroke-linecap="round" stroke-dasharray="276.5" stroke-dashoffset="44.2"
+            transform="rotate(-90 52 52)"></circle>
+        </svg>
+        <div class="ring-num">
+          <b>84%</b>
+          <span>VYUŽITIE<br>DNES</span>
+        </div>
+      </div>
+      <div class="hero-txt">
+        <div class="lbl">Dnes</div>
+        <div class="val">14,2<small>kWh</small></div>
+        <div class="delta">↑ 4,6 kWh oproti zajtrajšku</div>
+      </div>
+    </div>
+    <div class="arr-line">10,4 <b>kWp</b> · 2 stringy · sklon 32° · JV / JZ</div>
+  </div>
+
+  <div class="stats2">
+    <div class="panel stat">
+      <div class="lbl">Zajtra</div>
+      <div class="val">9,6<small>kWh</small></div>
+      <div class="note">zamračené</div>
+    </div>
+    <div class="panel stat">
+      <div class="lbl">7 dní celkom</div>
+      <div class="val">87,8<small>kWh</small></div>
+      <div class="note">priemer 12,5/deň</div>
+    </div>
+  </div>
+
+  <div class="shead">
+    <h2>Predpoveď výroby</h2>
+    <p>Premietnuté na rovinu tvojich panelov z predpovedaného žiarenia.</p>
+  </div>
+
+  <div class="panel daylist">
+    <div class="day-row today">
+      <div class="day-info"><div class="day-name">Po, dnes</div><div class="day-sub">strop 16,8 · špička 3,1 kW</div></div>
+      <div class="day-metric"><div class="mini-bar"><div class="mini-bar-fill" style="height:84%"></div></div><div class="day-val">14,2<span>kWh</span></div></div>
+    </div>
+    <div class="day-row">
+      <div class="day-info"><div class="day-name">Ut, zajtra</div><div class="day-sub">strop 16,5 · špička 2,4 kW</div></div>
+      <div class="day-metric"><div class="mini-bar"><div class="mini-bar-fill" style="height:58%"></div></div><div class="day-val">9,6<span>kWh</span></div></div>
+    </div>
+    <div class="day-row">
+      <div class="day-info"><div class="day-name">Streda</div><div class="day-sub">strop 17,1 · špička 3,4 kW</div></div>
+      <div class="day-metric"><div class="mini-bar"><div class="mini-bar-fill" style="height:92%"></div></div><div class="day-val">15,8<span>kWh</span></div></div>
+    </div>
+    <div class="day-row">
+      <div class="day-info"><div class="day-name">Štvrtok</div><div class="day-sub">strop 16,9 · špička 2,9 kW</div></div>
+      <div class="day-metric"><div class="mini-bar"><div class="mini-bar-fill" style="height:72%"></div></div><div class="day-val">12,1<span>kWh</span></div></div>
+    </div>
+    <div class="day-row">
+      <div class="day-info"><div class="day-name">Piatok</div><div class="day-sub">strop 17,2 · špička 1,6 kW</div></div>
+      <div class="day-metric"><div class="mini-bar"><div class="mini-bar-fill" style="height:37%"></div></div><div class="day-val">6,4<span>kWh</span></div></div>
+    </div>
+    <div class="day-row">
+      <div class="day-info"><div class="day-name">Sobota</div><div class="day-sub">strop 17,3 · špička 3,5 kW</div></div>
+      <div class="day-metric"><div class="mini-bar"><div class="mini-bar-fill" style="height:92%"></div></div><div class="day-val">16,0<span>kWh</span></div></div>
+    </div>
+    <div class="day-row">
+      <div class="day-info"><div class="day-name">Nedeľa</div><div class="day-sub">strop 17,1 · špička 3,0 kW</div></div>
+      <div class="day-metric"><div class="mini-bar"><div class="mini-bar-fill" style="height:80%"></div></div><div class="day-val">13,7<span>kWh</span></div></div>
+    </div>
+  </div>
+
+  <div class="foot">Čísla nie sú meranie. SolarCast prepočítava predpovedané žiarenie na rovinu tvojich panelov a ďalej na výkon podľa kWp, účinnosti a teploty.</div>
+</div>
+</x-dc>
+</body>
+</html>
