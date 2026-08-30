@@ -315,12 +315,21 @@ html[data-mode="light"] .tip b{color:#fff}
   .shead p{font-size:12.5px}
   .card{padding:13px;border-radius:12px}
 
-  .hero{margin-bottom:32px}
-  .hero-dial{padding:20px 16px 16px}
-  .hero-nums{padding:20px 18px;gap:0}
-  .hero-nums>div{padding:15px 0;border-top:1px solid var(--line-soft)}
-  .hero-nums>div:first-child{padding-top:0;border-top:none}
-  .hero-nums>div:last-child{padding-bottom:0}
+  /* Dial a "Dnes" sedia v jednom riadku (kompakt), Zajtra/7 dní pod nimi ako dvojica --
+     hero-nums sa rozpustí (display:contents) a jeho 3 deti sa stanú priamymi
+     flex položkami .hero; wrap sa postará o zalomenie do druhého riadku. */
+  .hero{background:none;border:none;border-radius:0;overflow:visible;
+    display:flex;flex-wrap:wrap;gap:10px;margin-bottom:24px}
+  .hero-dial{flex:0 0 auto;background:var(--panel);border:1px solid var(--line);
+    border-radius:var(--r);padding:14px 16px}
+  .hero-dial svg{width:96px;height:96px}
+  .dial-cap{display:none}
+  .hero-nums{display:contents}
+  .hero-nums>div{background:var(--panel);border:1px solid var(--line);
+    border-radius:var(--r);padding:14px 16px 13px;min-width:0}
+  .hero-nums>div:first-child{flex:1 1 160px}
+  .hero-nums>div:not(:first-child){flex:1 1 45%}
+  .note{overflow-wrap:break-word}
   .lbl{margin-bottom:7px}
   .big{font-size:27px}
   .note{font-size:12px;margin-top:6px}
