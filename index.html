@@ -1680,7 +1680,9 @@ function drawHeat(){
   var padL = nar ? (tiny() ? 30 : 38) : 76;
   var padT = 26, padR = nar ? 4 : 12, padB = 6, gap = nar ? 1 : 2;
   var W = availW('heat', 280);
-  var cw = (W - padL - padR)/24;
+  // heatmapa zobrazuje iba 05:00–21:30, mimo tohto rozsahu takmer nikdy nie je výkon
+  var h0 = 5, h1 = 22, hn = h1 - h0;
+  var cw = (W - padL - padR)/hn;
   var chh = nar ? Math.max(22, Math.min(30, cw*1.9)) : 33;
   var H = padT + model.days.length*chh + padB;
   svg.setAttribute('viewBox','0 0 '+W+' '+H);
@@ -1689,8 +1691,8 @@ function drawHeat(){
   var max = Math.max(model.maxHourAC, 0.4);
 
   var hStep = nar ? 6 : 3;
-  for (var h = 0; h < 24; h += hStep)
-    svg.appendChild(el('text',{x:padL + h*cw + cw/2, y:padT - 10,
+  for (var h = h0; h < h1; h += hStep)
+    svg.appendChild(el('text',{x:padL + (h-h0)*cw + cw/2, y:padT - 10,
       'font-size':nar?8.5:9.5,'text-anchor':'middle','letter-spacing':'.05em'},(h<10?'0':'')+h));
 
   model.days.forEach(function(d, r){
@@ -1700,14 +1702,17 @@ function drawHeat(){
       'text-anchor':'end','letter-spacing':'.03em'}, lbTxt);
     if (isToday(d)) lb.setAttribute('fill',PAL.text);
     svg.appendChild(lb);
-    if (d.sunrise != null && d.sunset != null)
-      svg.appendChild(el('rect',{x:padL + d.sunrise*cw, y:y+1,
-        width:Math.max(0,(d.sunset - d.sunrise)*cw), height:chh - gap - 1,
-        fill:'none', stroke:PAL.envelope,'stroke-width':1, rx:4}));
+    if (d.sunrise != null && d.sunset != null){
+      var sr = Math.max(h0, d.sunrise), ss = Math.min(h1, d.sunset);
+      if (ss > sr)
+        svg.appendChild(el('rect',{x:padL + (sr-h0)*cw, y:y+1,
+          width:Math.max(0,(ss - sr)*cw), height:chh - gap - 1,
+          fill:'none', stroke:PAL.envelope,'stroke-width':1, rx:4}));
+    }
 
-    for (var q = 0; q < 24; q++){
+    for (var q = h0; q < h1; q++){
       var c = d.hours[q], v = c ? c.ac : 0;
-      var rc = el('rect',{x:padL + q*cw + gap/2, y:y + gap/2,
+      var rc = el('rect',{x:padL + (q-h0)*cw + gap/2, y:y + gap/2,
         width:Math.max(0.5, cw - gap), height:chh - gap, rx:nar?2:3,
         fill: v > 0.02 ? heatColor(v/max) : PAL.emptyCell});
       if (v > 0.02){
