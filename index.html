@@ -184,7 +184,8 @@ tbody tr:last-child td{border-bottom:none}
 tbody tr{cursor:pointer}
 tbody tr:hover td{background:var(--surface-2)}
 tbody tr.today td{background:rgba(242,193,78,.045)}
-tbody tr.sel td{box-shadow:inset 3px 0 0 var(--cool)}
+tbody tr.sel td{background:color-mix(in oklab, var(--cool) 13%, transparent)}
+tbody tr.sel td:first-child{box-shadow:inset 3px 0 0 var(--cool)}
 th+th,td+td{padding-left:17px}
 .dcell{font-weight:500}
 .dcell span{display:block;font-family:var(--mono);font-size:10.5px;color:var(--dim-2);
