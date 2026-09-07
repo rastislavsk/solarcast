@@ -426,6 +426,13 @@ html[data-mode="light"] .tip b{color:#fff}
   .dash-grid section{margin-bottom:0}
   .dash-grid .card{padding:16px}
 
+  /* Prehľad dní ide na miesto heatmapy, heatmapa na miesto Dennej výroby
+     a Denná výroba na uvoľnené miesto po Prehľade dní — Priebeh dňa ostáva */
+  #secTable{order:1}
+  #secHeat{order:2}
+  #secCurve{order:3}
+  #secBars{order:4}
+
   #secTable table{min-width:0;font-size:13px}
   #secTable th+th,#secTable td+td{padding-left:12px}
 }
