@@ -1622,6 +1622,28 @@ function availW(svgId, min){
   return Math.max(min || 260, Math.floor(w));
 }
 
+/* Na tablete/PC (mriežka 2×2) majú dve dvojice sekcií tvoriť rovnako
+   vysoký blok: heatmapa sa prispôsobí výške Prehľadu dní, Denná výroba
+   výške Priebehu dňa. Vráti, koľko miesta ostáva pre graf v cieľovej
+   karte, aby jej sekcia ako celok (hlavička + karta) vyšla na rovnakú
+   výšku ako referenčná sekcia. Pod 980px dvojice nesedia vedľa seba,
+   tam sa nič nevynucuje. */
+function matchSectionH(refSecId, mySecId, min){
+  if ((window.innerWidth || 0) < 980) return null;
+  var ref = $(refSecId), my = $(mySecId);
+  if (!ref || !my) return null;
+  var shead = my.querySelector('.shead'), card = my.querySelector('.card');
+  if (!shead || !card) return null;
+  var refH = ref.getBoundingClientRect().height;
+  var sheadH = shead.getBoundingClientRect().height
+    + (parseFloat(window.getComputedStyle(shead).marginBottom) || 0);
+  var cardCs = window.getComputedStyle(card);
+  var cardChrome = (parseFloat(cardCs.paddingTop)||0) + (parseFloat(cardCs.paddingBottom)||0)
+    + (parseFloat(cardCs.borderTopWidth)||0) + (parseFloat(cardCs.borderBottomWidth)||0);
+  var avail = refH - sheadH - cardChrome;
+  return avail > 0 ? Math.max(min || 120, Math.floor(avail)) : null;
+}
+
 /* Dotykové zariadenie nemá kurzor. Rovnaké údaje preto sprístupníme
    cez ukazovacie udalosti, ktoré pokrývajú myš, prst aj pero. */
 /* Pri myši bublina zmizne, keď kurzor odíde z prvku. Prst ale prvok
@@ -1760,7 +1782,9 @@ function drawHeat(){
   // heatmapa zobrazuje iba 05:00–21:30, mimo tohto rozsahu takmer nikdy nie je výkon
   var h0 = 5, h1 = 22, hn = h1 - h0;
   var cw = (W - padL - padR)/hn;
-  var chh = nar ? Math.max(22, Math.min(30, cw*1.9)) : 33;
+  var matchH = matchSectionH('secTable', 'secHeat', 140);
+  var chh = matchH ? Math.max(14, (matchH - padT - padB)/model.days.length)
+          : (nar ? Math.max(22, Math.min(30, cw*1.9)) : 33);
   var H = padT + model.days.length*chh + padB;
   svg.setAttribute('viewBox','0 0 '+W+' '+H);
   svg.setAttribute('width','100%'); svg.setAttribute('height',H);
@@ -1842,7 +1866,7 @@ function drawBars(){
   var slot = (W - padL - padR)/n;
   var gp = Math.max(5, Math.min(22, slot*0.24));
   var bw = Math.max(10, slot - gp);
-  var H = nar ? 210 : 248;
+  var H = matchSectionH('secCurve', 'secBars', 160) || (nar ? 210 : 248);
   var plotH = H - padT - padB;
   svg.setAttribute('viewBox','0 0 '+W+' '+H);
   svg.setAttribute('width','100%'); svg.setAttribute('height',H);
@@ -2485,7 +2509,10 @@ function validateArray(msgId){
    RENDER + BOOT
    ============================================================ */
 function render(){
-  drawSummary(); drawDial(); drawHeat(); drawBars(); drawTabs(); drawCurve(); drawTable();
+  // Prehľad dní a Priebeh dňa idú prvé — heatmapa aj Denná výroba sa
+  // podľa ich vykreslenej výšky prispôsobujú (matchSectionH), takže
+  // musia mať referenciu už hotovú.
+  drawSummary(); drawDial(); drawTable(); drawTabs(); drawCurve(); drawHeat(); drawBars();
   // Editor v nastaveniach musí sedieť s tým, čo je práve zobrazené — inak
   // zostane po úvodnom nastavení prázdny až do obnovenia stránky.
   if ($('settings').classList.contains('hidden')){
@@ -2534,7 +2561,7 @@ function scheduleReflow(force){
     if (!force && window.innerWidth === lastW) return;
     lastW = window.innerWidth;
     hideTip();
-    drawDial(); drawHeat(); drawBars(); drawCurve();
+    drawDial(); drawCurve(); drawHeat(); drawBars();
   }, 140);
 }
 window.addEventListener('resize', function(){ scheduleReflow(false); });
