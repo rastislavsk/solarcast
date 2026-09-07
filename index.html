@@ -144,6 +144,12 @@ select.lang option{background:var(--surface);color:var(--text)}
 .big .u{font-size:14px;color:var(--dim);margin-left:5px;letter-spacing:0}
 .note{font-size:12.5px;color:var(--dim);margin-top:9px;line-height:1.45}
 .note b{color:var(--text);font-weight:500}
+/* "Najviac"/"najmenej" v #nWeek sú samostatné riadky, nie jedna
+   zalamovaná veta -- ľahšie sa k sebe priradí deň a hodnota. Druhý
+   riadok dostane veľké prvé písmeno, hoci preklad je kvôli pôvodnému
+   použitiu v jednej vete malými. */
+#nWeek div+div{margin-top:3px}
+#nWeek div:last-child::first-letter{text-transform:uppercase}
 .dial-cap{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;
   color:var(--dim-2);text-align:center}
 
@@ -2013,8 +2019,8 @@ function drawSummary(){
   $('kWeek').innerHTML = num(week,0)+'<span class="u">kWh</span>';
   var srt = model.days.slice().sort(function(a,b){ return b.kwh-a.kwh; });
   var best = srt[0], worst = srt[srt.length-1];
-  $('nWeek').innerHTML = esc(T('best'))+' <b>'+esc(dayLabel(best,true))+'</b> '+num(best.kwh,1)
-    + ' kWh · ' + esc(T('worst')) + ' <b>'+esc(dayLabel(worst,true))+'</b> '+num(worst.kwh,1)+' kWh';
+  $('nWeek').innerHTML = '<div>'+esc(T('best'))+' <b>'+esc(dayLabel(best,true))+'</b> '+num(best.kwh,1)+' kWh</div>'
+    + '<div>'+esc(T('worst'))+' <b>'+esc(dayLabel(worst,true))+'</b> '+num(worst.kwh,1)+' kWh</div>';
 
   paintHeader();
   $('dialCap').textContent = T('dialCap');
