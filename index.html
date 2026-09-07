@@ -343,6 +343,11 @@ html[data-mode="light"] .tip b{color:#fff}
   .hero-nums>div{background:var(--panel);border:1px solid var(--line);
     border-radius:var(--r);padding:14px 16px 13px;min-width:0;display:flex;
     flex-direction:column;justify-content:center}
+  /* na mobile má "Dnes" vlastný orámovaný panel ako ostatné 3 polia,
+     takže zdedený desktopový zvýrazňovací gradient s presahujúcim
+     margin-om (ktorý ho robil väčším než ostatné) treba zrušiť. */
+  .hero-nums>div:first-child{background:var(--panel);border-radius:var(--r);
+    margin:0;padding:14px 16px 13px}
   .note{overflow-wrap:break-word}
   .lbl{margin-bottom:7px}
   .big{font-size:27px}
