@@ -397,6 +397,50 @@ html[data-mode="light"] .tip b{color:#fff}
   .big{font-size:24px}
   .compass button{padding:9px 0;font-size:10.5px}
 }
+
+/* ============================================================
+   TABLET / PC — DASHBOARD
+   Od 980px nahor (tablet naležato, notebook, monitor) je na šírku
+   dosť miesta, aby sa štyri grafové sekcie zmestili do mriežky
+   2×2 namiesto dlhého jedného stĺpca. Celá appka (hlavička + hero
+   + mriežka) sa potom natiahne presne na výšku okna: mriežka
+   dostane, čo zvýši po hlavičke a hero paneli, a grafy si podľa
+   toho premeriavajú vlastnú výšku (funkcia availH v skripte).
+   Ak by sa aj tak nezmestili (veľmi nízke okno, silné priblíženie),
+   stránka namiesto orezania obsahu radšej scrolluje ako celok —
+   to rieši min-height na .app-fit nižšie.
+   ============================================================ */
+@media(min-width:980px){
+  .wrap{max-width:1360px}
+  body:has(#app:not(.hidden)){padding-bottom:0}
+  body:has(#app:not(.hidden)) .wrap{
+    height:100vh;display:flex;flex-direction:column;padding-bottom:18px}
+  body:has(#app:not(.hidden)) .top{
+    flex:0 0 auto;padding:20px 0 14px;margin-bottom:14px}
+  body:has(#app:not(.hidden)) #app{
+    flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
+
+  #app .hero{margin-bottom:14px;flex:0 0 auto}
+  #app .hero-dial{padding:14px}
+  #app .dial-cap{margin-top:2px}
+
+  .dash-grid{flex:1 1 auto;min-height:420px;display:grid;
+    grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:16px}
+  .dash-grid section{margin-bottom:0;min-height:0;display:flex;flex-direction:column}
+  .dash-grid .shead{margin-bottom:8px;flex:0 0 auto}
+  .dash-grid .shead p{display:none}
+  .dash-grid #dayTabs{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;max-width:100%}
+  .dash-grid #dayTabs::-webkit-scrollbar{display:none}
+  .dash-grid #dayTabs .tab{flex:none}
+  .dash-grid .card{flex:1 1 auto;min-height:90px;padding:12px 14px}
+  .dash-grid .card svg{display:block}
+  .dash-grid #curveLeg{flex:0 1 auto;min-height:0;margin-top:6px!important;font-size:9.5px;row-gap:3px}
+  #secTable .card{overflow-y:auto}
+  #secTable table{min-width:0;font-size:12.5px}
+  #secTable th+th,#secTable td+td{padding-left:11px}
+  #secTable td{padding:9px 0}
+}
+@media(min-width:1700px){ .wrap{max-width:1600px} }
 </style>
 </head>
 <body>
@@ -662,44 +706,45 @@ html[data-mode="light"] .tip b{color:#fff}
       </div>
     </div>
 
-    <section>
-      <div class="shead">
-        <div><h2 data-t="heatT"></h2><p data-t="heatD"></p></div>
-        <div class="legend" id="heatLeg"></div>
-      </div>
-      <div class="card scroll"><svg id="heat"></svg></div>
-    </section>
-
-    <section>
-      <div class="shead">
-        <div><h2 data-t="barsT"></h2><p data-t="barsD"></p></div>
-        <div class="legend">
-          <span><i style="background:var(--accent)"></i><span data-t="legForecast"></span></span>
-          <span><i style="background:transparent;border:1px solid var(--dim-2)"></i><span data-t="legCeiling"></span></span>
+    <div class="dash-grid">
+      <section id="secHeat">
+        <div class="shead">
+          <div><h2 data-t="heatT"></h2><p data-t="heatD"></p></div>
+          <div class="legend" id="heatLeg"></div>
         </div>
-      </div>
-      <div class="card scroll"><svg id="bars"></svg></div>
-    </section>
+        <div class="card scroll"><svg id="heat"></svg></div>
+      </section>
 
-    <section>
-      <div class="shead">
-        <div><h2 data-t="curveT"></h2><p data-t="curveD"></p></div>
-        <div class="tabs" id="dayTabs" role="tablist"></div>
-      </div>
-      <div class="card scroll"><svg id="curve"></svg></div>
-      <div class="legend" id="curveLeg" style="margin-top:15px"></div>
-    </section>
+      <section id="secBars">
+        <div class="shead">
+          <div><h2 data-t="barsT"></h2><p data-t="barsD"></p></div>
+          <div class="legend">
+            <span><i style="background:var(--accent)"></i><span data-t="legForecast"></span></span>
+            <span><i style="background:transparent;border:1px solid var(--dim-2)"></i><span data-t="legCeiling"></span></span>
+          </div>
+        </div>
+        <div class="card scroll"><svg id="bars"></svg></div>
+      </section>
 
-    <section>
-      <div class="shead"><div><h2 data-t="tableT"></h2></div></div>
-      <div class="card scroll">
-        <table>
-          <thead><tr id="thRow"></tr></thead>
-          <tbody id="tbody"></tbody>
-        </table>
-      </div>
-    </section>
+      <section id="secCurve">
+        <div class="shead">
+          <div><h2 data-t="curveT"></h2><p data-t="curveD"></p></div>
+          <div class="tabs" id="dayTabs" role="tablist"></div>
+        </div>
+        <div class="card scroll"><svg id="curve"></svg></div>
+        <div class="legend" id="curveLeg" style="margin-top:15px"></div>
+      </section>
 
+      <section id="secTable">
+        <div class="shead"><div><h2 data-t="tableT"></h2></div></div>
+        <div class="card scroll">
+          <table>
+            <thead><tr id="thRow"></tr></thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
 
   </main>
 </div>
@@ -1560,6 +1605,9 @@ function isToday(d){
    ============================================================ */
 function narrow(){ return (window.innerWidth || 1024) < 700; }
 function tiny(){ return (window.innerWidth || 1024) < 420; }
+// tablet naležato a PC: štyri grafy v mriežke 2×2, každý si meria
+// vlastnú výšku podľa toho, koľko miesta mu ostane (pozri availH)
+function wideDash(){ return (window.innerWidth || 0) >= 980; }
 
 function availW(svgId, min){
   var svg = $(svgId);
@@ -1570,6 +1618,15 @@ function availW(svgId, min){
   var cs = host && window.getComputedStyle ? window.getComputedStyle(host) : null;
   if (cs) w -= (parseFloat(cs.paddingLeft)||0) + (parseFloat(cs.paddingRight)||0);
   return Math.max(min || 260, Math.floor(w));
+}
+
+function availH(svgId, min){
+  var svg = $(svgId);
+  var host = svg && svg.parentNode;
+  var h = host ? host.clientHeight : 0;
+  var cs = host && window.getComputedStyle ? window.getComputedStyle(host) : null;
+  if (cs) h -= (parseFloat(cs.paddingTop)||0) + (parseFloat(cs.paddingBottom)||0);
+  return Math.max(min || 120, Math.floor(h));
 }
 
 /* Dotykové zariadenie nemá kurzor. Rovnaké údaje preto sprístupníme
@@ -1641,7 +1698,7 @@ var model = null, sel = 0;
 function drawDial(){
   var svg = $('dial');
   svg.innerHTML = '';
-  var side = tiny() ? 150 : (narrow() ? 168 : 190);
+  var side = tiny() ? 150 : (narrow() ? 168 : (wideDash() ? 150 : 190));
   svg.setAttribute('viewBox','0 0 190 190');
   svg.setAttribute('width', side); svg.setAttribute('height', side);
   var cx = 95, cy = 95, R = 76;
@@ -1702,7 +1759,8 @@ function drawHeat(){
   // heatmapa zobrazuje iba 05:00–21:30, mimo tohto rozsahu takmer nikdy nie je výkon
   var h0 = 5, h1 = 22, hn = h1 - h0;
   var cw = (W - padL - padR)/hn;
-  var chh = nar ? Math.max(22, Math.min(30, cw*1.9)) : 33;
+  var chh = wideDash() ? Math.max(14, (availH('heat', 140) - padT - padB)/model.days.length)
+          : (nar ? Math.max(22, Math.min(30, cw*1.9)) : 33);
   var H = padT + model.days.length*chh + padB;
   svg.setAttribute('viewBox','0 0 '+W+' '+H);
   svg.setAttribute('width','100%'); svg.setAttribute('height',H);
@@ -1777,7 +1835,7 @@ function drawBars(){
   var slot = (W - padL - padR)/n;
   var gp = Math.max(5, Math.min(22, slot*0.24));
   var bw = Math.max(10, slot - gp);
-  var H = nar ? 210 : 248;
+  var H = wideDash() ? availH('bars', 160) : (nar ? 210 : 248);
   var plotH = H - padT - padB;
   svg.setAttribute('viewBox','0 0 '+W+' '+H);
   svg.setAttribute('width','100%'); svg.setAttribute('height',H);
@@ -1845,7 +1903,7 @@ function drawCurve(){
   var nar = narrow();
   var padL = nar ? 30 : 46, padT = 22, padR = nar ? 34 : 54, padB = nar ? 34 : 40;
   var W = availW('curve', 280);
-  var H = nar ? 235 : 296;
+  var H = wideDash() ? availH('curve', 160) : (nar ? 235 : 296);
   var plotW = W-padL-padR, plotH = H-padT-padB;
   svg.setAttribute('viewBox','0 0 '+W+' '+H);
   svg.setAttribute('width','100%'); svg.setAttribute('height',H);
@@ -2450,13 +2508,17 @@ document.addEventListener('scroll', hideTip, true);
 /* Zmena šírky okna aj otočenie telefónu menia rozmery grafov,
    preto sa prekresľujú všetky. Prekreslenie sa zdrží, aby sa
    pri plynulom ťahaní okna nespúšťalo pri každom pixeli. */
-var reflowTimer = null, lastW = window.innerWidth;
+var reflowTimer = null, lastW = window.innerWidth, lastH = window.innerHeight;
 function scheduleReflow(force){
   clearTimeout(reflowTimer);
   reflowTimer = setTimeout(function(){
     if (!model) return;
-    if (!force && window.innerWidth === lastW) return;
-    lastW = window.innerWidth;
+    var wChanged = window.innerWidth !== lastW;
+    // výška okna zaujíma len v dashboard mriežke (tablet/PC) — grafy tam
+    // vypĺňajú presne toľko miesta, koľko im ostane po hlavičke a hero paneli
+    var hChanged = wideDash() && window.innerHeight !== lastH;
+    if (!force && !wChanged && !hChanged) return;
+    lastW = window.innerWidth; lastH = window.innerHeight;
     hideTip();
     drawDial(); drawHeat(); drawBars(); drawCurve();
   }, 140);
