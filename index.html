@@ -328,6 +328,11 @@ html[data-mode="light"] .tip b{color:#fff}
   .shead p{font-size:12.5px}
   .card{padding:13px;border-radius:12px}
 
+  /* Prehľad dní na telefóne ide nad heatmapu -- flex+order namiesto
+     presunu v DOM, nech sa nič nemení na tom, ako naň skript pristupuje */
+  .dash-grid{display:flex;flex-direction:column}
+  #secTable{order:-1}
+
   /* Mriežka 2×2 so 4 rovnako veľkými poľami (dial, dnes, zajtra, 7 dní) --
      hero-nums sa rozpustí (display:contents) a jeho 3 deti sa stanú priamymi
      položkami mriežky .hero vedľa dialu. grid-auto-rows:1fr zarovná výšku
