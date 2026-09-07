@@ -144,12 +144,13 @@ select.lang option{background:var(--surface);color:var(--text)}
 .big .u{font-size:14px;color:var(--dim);margin-left:5px;letter-spacing:0}
 .note{font-size:12.5px;color:var(--dim);margin-top:9px;line-height:1.45}
 .note b{color:var(--text);font-weight:500}
-/* "Najviac"/"najmenej" v #nWeek sú samostatné riadky, nie jedna
-   zalamovaná veta -- ľahšie sa k sebe priradí deň a hodnota. Druhý
-   riadok dostane veľké prvé písmeno, hoci preklad je kvôli pôvodnému
-   použitiu v jednej vete malými. */
+/* Najviac/najmenej v #nWeek sú samostatné riadky (nie jedna zalamovaná
+   veta) a namiesto slova majú šípkovú ikonu -- ušetrí miesto a je to
+   jazykovo neutrálne. */
 #nWeek div+div{margin-top:3px}
-#nWeek div:last-child::first-letter{text-transform:uppercase}
+#nWeek svg{width:12px;height:12px;vertical-align:-1.5px;margin-right:4px;
+  fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+#nWeek svg.wk-best{stroke:var(--accent)}
 .dial-cap{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;
   color:var(--dim-2);text-align:center}
 
@@ -1573,6 +1574,11 @@ function esc(t){
     return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];
   });
 }
+/* šípková mini-ikona namiesto slova "najviac"/"najmenej" v #nWeek;
+   label ostáva ako aria-label pre čítačky obrazovky. */
+function wkIcon(d, cls, label){
+  return '<svg class="'+cls+'" viewBox="0 0 24 24" role="img" aria-label="'+esc(label)+'"><path d="'+d+'"/></svg>';
+}
 function num(v, d){
   d = d == null ? 1 : d;
   if (v == null || !isFinite(v)) return '–';
@@ -2054,8 +2060,8 @@ function drawSummary(){
   $('kWeek').innerHTML = num(week,0)+'<span class="u">kWh</span>';
   var srt = model.days.slice().sort(function(a,b){ return b.kwh-a.kwh; });
   var best = srt[0], worst = srt[srt.length-1];
-  $('nWeek').innerHTML = '<div>'+esc(T('best'))+' <b>'+esc(dayLabel(best,true))+'</b> '+num(best.kwh,1)+' kWh</div>'
-    + '<div>'+esc(T('worst'))+' <b>'+esc(dayLabel(worst,true))+'</b> '+num(worst.kwh,1)+' kWh</div>';
+  $('nWeek').innerHTML = '<div>'+wkIcon('M5 15l7-7 7 7','wk-best',T('best'))+'<b>'+esc(dayLabel(best,true))+'</b> '+num(best.kwh,1)+' kWh</div>'
+    + '<div>'+wkIcon('M5 9l7 7 7-7','',T('worst'))+'<b>'+esc(dayLabel(worst,true))+'</b> '+num(worst.kwh,1)+' kWh</div>';
 
   paintHeader();
   $('dialCap').textContent = T('dialCap');
