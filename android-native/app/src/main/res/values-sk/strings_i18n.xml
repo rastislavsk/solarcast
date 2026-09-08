@@ -80,7 +80,6 @@
     <string name="t_best">Najviac</string>
     <string name="t_worst">najmenej</string>
     <string name="t_heatT">Kedy sa v týždni vyrába</string>
-    <string name="t_heatD">Riadok je deň, stĺpec hodina, intenzita je striedavý výkon. Svetlá obálka označuje čas medzi východom a západom slnka.</string>
     <string name="t_barsT">Denná výroba</string>
     <string name="t_barsD">Plný stĺpec je predpoveď, obrys za ním modelový bezoblačný strop. Rozdiel je to, čo zoberie oblačnosť.</string>
     <string name="t_curveT">Priebeh dňa po stringoch</string>

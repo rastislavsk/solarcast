@@ -80,7 +80,6 @@
     <string name="t_best">Am meisten</string>
     <string name="t_worst">am wenigsten</string>
     <string name="t_heatT">Wann die Woche Ertrag bringt</string>
-    <string name="t_heatD">Eine Zeile je Tag, eine Spalte je Stunde, die Intensität ist die AC-Leistung. Der helle Rahmen zeigt Sonnenauf- und -untergang.</string>
     <string name="t_barsT">Tagesertrag</string>
     <string name="t_barsD">Der volle Balken ist die Prognose, die Kontur dahinter die modellierte Obergrenze bei klarem Himmel. Die Differenz nehmen die Wolken.</string>
     <string name="t_curveT">Tagesverlauf nach Strings</string>
