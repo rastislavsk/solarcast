@@ -1878,17 +1878,19 @@ function drawHeat(){
 function drawBars(){
   var svg = $('bars'); svg.innerHTML = '';
   var nar = narrow();
-  var padL = nar ? 30 : 48, padT = 20, padR = nar ? 6 : 14, padBmin = nar ? 42 : 46;
+  var padL = nar ? 30 : 48, padT = nar ? 20 : 22, padR = nar ? 6 : 14, padBmin = nar ? 42 : 46;
   var W = availW('bars', 280);
   var n = model.days.length;
   var slot = (W - padL - padR)/n;
   var gp = Math.max(5, Math.min(22, slot*0.24));
   var bw = Math.max(10, slot - gp);
-  // grafová plocha (bez osí) je rovnako vysoká ako v Priebehu dňa --
-  // stĺpce tak vyzerajú rovnako "vysoké" pole ako krivka vedľa nich
+  // grafová plocha (bez osí) je rovnako vysoká ako v Priebehu dňa a začína
+  // v tej istej výške (rovnaké padT aj padB) -- základná čiara aj mriežka
+  // tak vyjdú presne na úrovni krivky vedľa nich, nielen rovnako vysoké
   var padB = padBmin;
   var plotH = (!nar && lastCurvePlotH) ? lastCurvePlotH : (nar ? 210 : 248) - padT - padBmin;
   var H = padT + plotH + padB;
+  alignShead('secCurve', 'secBars');
   svg.setAttribute('viewBox','0 0 '+W+' '+H);
   svg.setAttribute('width','100%'); svg.setAttribute('height',H);
   svg.style.minWidth = '';
@@ -1960,7 +1962,7 @@ function drawCurve(){
   var svg = $('curve'); svg.innerHTML = '';
   var d = model.days[sel]; if (!d) return;
   var nar = narrow();
-  var padL = nar ? 30 : 46, padT = 22, padR = nar ? 34 : 54, padB = nar ? 34 : 40;
+  var padL = nar ? 30 : 46, padT = 22, padR = nar ? 34 : 54, padB = nar ? 34 : 46;
   var W = availW('curve', 280);
   var H = nar ? 235 : 296;
   var plotW = W-padL-padR, plotH = H-padT-padB;
