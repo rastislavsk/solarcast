@@ -712,7 +712,7 @@ html[data-mode="light"] .tip b{color:#fff}
     <div class="dash-grid">
       <section id="secHeat">
         <div class="shead">
-          <div><h2 data-t="heatT"></h2><p data-t="heatD"></p></div>
+          <div><h2 data-t="heatT"></h2></div>
           <div class="legend" id="heatLeg"></div>
         </div>
         <div class="card scroll"><svg id="heat"></svg></div>
@@ -721,12 +721,12 @@ html[data-mode="light"] .tip b{color:#fff}
       <section id="secBars">
         <div class="shead">
           <div><h2 data-t="barsT"></h2><p data-t="barsD"></p></div>
-          <div class="legend">
-            <span><i style="background:var(--accent)"></i><span data-t="legForecast"></span></span>
-            <span><i style="background:transparent;border:1px solid var(--dim-2)"></i><span data-t="legCeiling"></span></span>
-          </div>
         </div>
         <div class="card scroll"><svg id="bars"></svg></div>
+        <div class="legend" id="barsLeg" style="margin-top:15px">
+          <span><i style="background:var(--accent)"></i><span data-t="legForecast"></span></span>
+          <span><i style="background:transparent;border:1px solid var(--dim-2)"></i><span data-t="legCeiling"></span></span>
+        </div>
       </section>
 
       <section id="secCurve">
@@ -801,7 +801,7 @@ sk:{
  today:'Dnes', tomorrow:'Zajtra', sevenDays:'7 dní celkom',
  peakAt:'špička {p} kW o {h}', noProd:'bez výroby', atAcLimit:'na limite meniča',
  vsToday:'oproti dnešku', best:'Najviac', worst:'najmenej',
- heatT:'Kedy sa v týždni vyrába', heatD:'Riadok je deň, stĺpec hodina, intenzita je striedavý výkon. Svetlá obálka označuje čas medzi východom a západom slnka.',
+ heatT:'Kedy sa v týždni vyrába',
  barsT:'Denná výroba', barsD:'Plný stĺpec je predpoveď, obrys za ním modelový bezoblačný strop. Rozdiel je to, čo zoberie oblačnosť.',
  curveT:'Priebeh dňa po stringoch', curveD:'Stringy sú zoradené podľa svetovej strany. Modrá bodkovaná čiara je oblačnosť na pravej osi.',
  tableT:'Prehľad dní',
@@ -863,7 +863,7 @@ en:{
  today:'Today', tomorrow:'Tomorrow', sevenDays:'7-day total',
  peakAt:'peak {p} kW at {h}', noProd:'no output', atAcLimit:'at inverter limit',
  vsToday:'vs today', best:'Best', worst:'worst',
- heatT:'When the week produces', heatD:'Each row is a day, each column an hour, and the intensity is AC output. The pale outline marks sunrise to sunset.',
+ heatT:'When the week produces',
  barsT:'Daily output', barsD:'The solid bar is the forecast, the outline behind it a modelled clear-sky ceiling. The gap is what cloud takes away.',
  curveT:'Day profile by string', curveD:'Strings are ordered by the direction they face. The blue dotted line is cloud cover on the right axis.',
  tableT:'Day by day',
@@ -925,7 +925,7 @@ de:{
  today:'Heute', tomorrow:'Morgen', sevenDays:'7 Tage gesamt',
  peakAt:'Spitze {p} kW um {h}', noProd:'kein Ertrag', atAcLimit:'am Wechselrichterlimit',
  vsToday:'gegenüber heute', best:'Am meisten', worst:'am wenigsten',
- heatT:'Wann die Woche Ertrag bringt', heatD:'Eine Zeile je Tag, eine Spalte je Stunde, die Intensität ist die AC-Leistung. Der helle Rahmen zeigt Sonnenauf- und -untergang.',
+ heatT:'Wann die Woche Ertrag bringt',
  barsT:'Tagesertrag', barsD:'Der volle Balken ist die Prognose, die Kontur dahinter die modellierte Obergrenze bei klarem Himmel. Die Differenz nehmen die Wolken.',
  curveT:'Tagesverlauf nach Strings', curveD:'Die Strings sind nach Himmelsrichtung sortiert. Die blaue gepunktete Linie ist die Bewölkung auf der rechten Achse.',
  tableT:'Tag für Tag',
@@ -987,7 +987,7 @@ zh:{
  today:'今天', tomorrow:'明天', sevenDays:'7 天合计',
  peakAt:'峰值 {p} kW，出现在 {h}', noProd:'无发电', atAcLimit:'已达逆变器上限',
  vsToday:'相比今天', best:'最多', worst:'最少',
- heatT:'一周中的发电时段', heatD:'每行一天，每列一小时，颜色深浅代表交流输出功率。浅色边框标示日出到日落。',
+ heatT:'一周中的发电时段',
  barsT:'每日发电量', barsD:'实心柱是预测值，后面的轮廓是晴空模型上限。两者之差就是云层带走的部分。',
  curveT:'各组串的日内曲线', curveD:'组串按朝向排序。蓝色点线是云量，对应右侧坐标轴。',
  tableT:'逐日明细',
@@ -1625,26 +1625,29 @@ function availW(svgId, min){
   return Math.max(min || 260, Math.floor(w));
 }
 
-/* Na tablete/PC (mriežka 2×2) majú dve dvojice sekcií tvoriť rovnako
-   vysoký blok: heatmapa sa prispôsobí výške Prehľadu dní, Denná výroba
-   výške Priebehu dňa. Vráti, koľko miesta ostáva pre graf v cieľovej
-   karte, aby jej sekcia ako celok (hlavička + karta) vyšla na rovnakú
-   výšku ako referenčná sekcia. Pod 980px dvojice nesedia vedľa seba,
-   tam sa nič nevynucuje. */
-function matchSectionH(refSecId, mySecId, min){
-  if ((window.innerWidth || 0) < 980) return null;
-  var ref = $(refSecId), my = $(mySecId);
-  if (!ref || !my) return null;
-  var shead = my.querySelector('.shead'), card = my.querySelector('.card');
-  if (!shead || !card) return null;
-  var refH = ref.getBoundingClientRect().height;
-  var sheadH = shead.getBoundingClientRect().height
-    + (parseFloat(window.getComputedStyle(shead).marginBottom) || 0);
-  var cardCs = window.getComputedStyle(card);
-  var cardChrome = (parseFloat(cardCs.paddingTop)||0) + (parseFloat(cardCs.paddingBottom)||0)
-    + (parseFloat(cardCs.borderTopWidth)||0) + (parseFloat(cardCs.borderBottomWidth)||0);
-  var avail = refH - sheadH - cardChrome;
-  return avail > 0 ? Math.max(min || 120, Math.floor(avail)) : null;
+/* Na tablete/PC (mriežka 2×2) majú Prehľad dní a heatmapa rovnaké
+   hlavičky, aby ich karty začínali v tej istej výške -- inak by sa
+   dni v oboch poliach nekryli, aj keby mali rovnaké riadky. */
+function alignShead(aSecId, bSecId){
+  var a = $(aSecId), b = $(bSecId);
+  var ah = a && a.querySelector('.shead'), bh = b && b.querySelector('.shead');
+  if (!ah || !bh) return;
+  ah.style.minHeight = ''; bh.style.minHeight = '';
+  if ((window.innerWidth || 0) < 980) return;
+  var h = Math.max(ah.getBoundingClientRect().height, bh.getBoundingClientRect().height);
+  ah.style.minHeight = bh.style.minHeight = h + 'px';
+}
+
+/* Riadky heatmapy majú byť presne v jednej rovine s riadkami tabuľky
+   Prehľadu dní -- namiesto dopočítavania výšky sa preberie priamo
+   z vykresleného hlavičkového a dátového riadku tabuľky. */
+function tableRowGeom(){
+  var thead = document.querySelector('#secTable thead');
+  var row = document.querySelector('#secTable tbody tr');
+  if (!thead || !row) return null;
+  var padT = thead.getBoundingClientRect().height;
+  var rowH = row.getBoundingClientRect().height;
+  return (padT > 0 && rowH > 0) ? { padT:padT, rowH:rowH } : null;
 }
 
 /* Dotykové zariadenie nemá kurzor. Rovnaké údaje preto sprístupníme
@@ -1706,6 +1709,9 @@ document.addEventListener('scroll', function(){
 }, true);
 
 var model = null, sel = 0;
+// výška grafovej plochy Priebehu dňa -- Denná výroba si podľa nej
+// zníži stĺpce, aby obe grafické časti vyšli rovnako vysoké
+var lastCurvePlotH = null;
 
 // jedno miesto pravdy pre vybraný deň -- klik v ktoromkoľvek poli
 // (tabuľka, heatmapa, stĺpce, karty dní) prekreslí zvýraznenie vo všetkých
@@ -1780,13 +1786,15 @@ function drawHeat(){
   var svg = $('heat'); svg.innerHTML = '';
   var nar = narrow();
   var padL = nar ? (tiny() ? 30 : 38) : 76;
-  var padT = 26, padR = nar ? 4 : 12, padB = 6, gap = nar ? 1 : 2;
+  var padR = nar ? 4 : 12, gap = nar ? 1 : 2;
   var W = availW('heat', 280);
   // heatmapa zobrazuje iba 05:00–21:30, mimo tohto rozsahu takmer nikdy nie je výkon
   var h0 = 5, h1 = 22, hn = h1 - h0;
   var cw = (W - padL - padR)/hn;
-  var matchH = matchSectionH('secTable', 'secHeat', 140);
-  var chh = matchH ? Math.max(14, (matchH - padT - padB)/model.days.length)
+  var geom = nar ? null : tableRowGeom();
+  var padT = geom ? geom.padT : 26;
+  var padB = geom ? 0 : 6;
+  var chh = geom ? geom.rowH
           : (nar ? Math.max(22, Math.min(30, cw*1.9)) : 33);
   var H = padT + model.days.length*chh + padB;
   svg.setAttribute('viewBox','0 0 '+W+' '+H);
@@ -1855,6 +1863,13 @@ function drawHeat(){
   }
   lg.appendChild(sw);
   var b = document.createElement('span'); b.textContent = num(max,1)+' kW'; lg.appendChild(b);
+
+  // hlavičky oboch polí musia vyjsť na rovnakú výšku, nech dni v tabuľke
+  // a v heatmape ostanú v jednej rovine -- meria sa až po naplnení
+  // legendy vyššie, inak by sa započítala jej výška spred prekreslenia.
+  // Volá sa vždy (aj na mobile), lebo funkcia sama zruší vynútenú výšku
+  // z predošlého prekreslenia, keď sa okno zúžilo pod 980px.
+  alignShead('secTable', 'secHeat');
 }
 
 /* ============================================================
@@ -1863,14 +1878,17 @@ function drawHeat(){
 function drawBars(){
   var svg = $('bars'); svg.innerHTML = '';
   var nar = narrow();
-  var padL = nar ? 30 : 48, padT = 20, padR = nar ? 6 : 14, padB = nar ? 42 : 46;
+  var padL = nar ? 30 : 48, padT = 20, padR = nar ? 6 : 14, padBmin = nar ? 42 : 46;
   var W = availW('bars', 280);
   var n = model.days.length;
   var slot = (W - padL - padR)/n;
   var gp = Math.max(5, Math.min(22, slot*0.24));
   var bw = Math.max(10, slot - gp);
-  var H = matchSectionH('secCurve', 'secBars', 160) || (nar ? 210 : 248);
-  var plotH = H - padT - padB;
+  // grafová plocha (bez osí) je rovnako vysoká ako v Priebehu dňa --
+  // stĺpce tak vyzerajú rovnako "vysoké" pole ako krivka vedľa nich
+  var padB = padBmin;
+  var plotH = (!nar && lastCurvePlotH) ? lastCurvePlotH : (nar ? 210 : 248) - padT - padBmin;
+  var H = padT + plotH + padB;
   svg.setAttribute('viewBox','0 0 '+W+' '+H);
   svg.setAttribute('width','100%'); svg.setAttribute('height',H);
   svg.style.minWidth = '';
@@ -1946,6 +1964,7 @@ function drawCurve(){
   var W = availW('curve', 280);
   var H = nar ? 235 : 296;
   var plotW = W-padL-padR, plotH = H-padT-padB;
+  if (!nar) lastCurvePlotH = plotH;
   svg.setAttribute('viewBox','0 0 '+W+' '+H);
   svg.setAttribute('width','100%'); svg.setAttribute('height',H);
   svg.style.minWidth = '';
@@ -2512,9 +2531,9 @@ function validateArray(msgId){
    RENDER + BOOT
    ============================================================ */
 function render(){
-  // Prehľad dní a Priebeh dňa idú prvé — heatmapa aj Denná výroba sa
-  // podľa ich vykreslenej výšky prispôsobujú (matchSectionH), takže
-  // musia mať referenciu už hotovú.
+  // Prehľad dní a Priebeh dňa idú prvé — heatmapa preberá výšku
+  // riadkov priamo z tabuľky a Denná výroba výšku grafovej plochy
+  // z Priebehu dňa, takže musia mať referenciu už hotovú.
   drawSummary(); drawDial(); drawTable(); drawTabs(); drawCurve(); drawHeat(); drawBars();
   // Editor v nastaveniach musí sedieť s tým, čo je práve zobrazené — inak
   // zostane po úvodnom nastavení prázdny až do obnovenia stránky.
