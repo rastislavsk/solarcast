@@ -64,7 +64,7 @@ fun ForecastScreen(
         SummaryCard(model, todayIndex)
         Spacer(Modifier.height(32.dp))
 
-        SectionHeader(stringResource(R.string.t_heatT), description = stringResource(R.string.t_heatD))
+        SectionHeader(stringResource(R.string.t_heatT))
         SolarCard(padding = 12) {
             HeatmapChart(
                 model = model,

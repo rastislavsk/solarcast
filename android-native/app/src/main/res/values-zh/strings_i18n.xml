@@ -80,7 +80,6 @@
     <string name="t_best">最多</string>
     <string name="t_worst">最少</string>
     <string name="t_heatT">一周中的发电时段</string>
-    <string name="t_heatD">每行一天，每列一小时，颜色深浅代表交流输出功率。浅色边框标示日出到日落。</string>
     <string name="t_barsT">每日发电量</string>
     <string name="t_barsD">实心柱是预测值，后面的轮廓是晴空模型上限。两者之差就是云层带走的部分。</string>
     <string name="t_curveT">各组串的日内曲线</string>

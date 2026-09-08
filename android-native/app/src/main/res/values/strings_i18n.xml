@@ -80,7 +80,6 @@
     <string name="t_best">Best</string>
     <string name="t_worst">worst</string>
     <string name="t_heatT">When the week produces</string>
-    <string name="t_heatD">Each row is a day, each column an hour, and the intensity is AC output. The pale outline marks sunrise to sunset.</string>
     <string name="t_barsT">Daily output</string>
     <string name="t_barsD">The solid bar is the forecast, the outline behind it a modelled clear-sky ceiling. The gap is what cloud takes away.</string>
     <string name="t_curveT">Day profile by string</string>
