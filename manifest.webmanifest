@@ -3,7 +3,7 @@
     "short_name": "SolarCast",
     "description": "Sedemdňová predpoveď výroby fotovoltiky pre konkrétnu lokalitu a zostavu panelov.",
     "lang": "sk",
-    "id": "./",
+    "id": "/solarcast/",
     "start_url": "./index.html",
     "scope": "./",
     "display": "standalone",

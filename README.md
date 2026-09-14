@@ -11,6 +11,7 @@ onto your actual panel planes.
 | --- | --- |
 | `index.html` | The whole web app. One standalone file, no build step, no backend. Open it in a browser and it works. |
 | `android-native/` | Native Android app: Kotlin and Jetpack Compose, no WebView, the solar model ported to Kotlin. See [android-native/README.md](android-native/README.md). |
+| `manifest.webmanifest` | PWA manifest. `id` is spelled out as `/solarcast/` on purpose: a relative `"./"` resolves against the *origin*, not the manifest's own directory, so every app on the same GitHub Pages domain ends up claiming the identical app id and Chrome then refuses to install a second one. |
 | `PRIVACY.md` | Privacy policy. Play requires a public URL for it. |
 
 `index.html` is the single source of truth for the Android app: a generator
